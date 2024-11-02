@@ -1,4 +1,5 @@
 #!/usr/bine/env python
+
 import argparse
 from flask import Flask, Response, request
 
@@ -14,7 +15,7 @@ ROOT_API = '/api/v1'
 
 '''Recurso de la API correspondiente con "API_ROOT/blob" '''
 @app.route(f'{ROOT_API}/blob', methods = ('PUT',))
-def add_blob():
+def put_blob():
     auth_token = request.headers.get('AuthToken')
     
     #Comprobacion de la presencia del token de autenticacion
@@ -67,6 +68,49 @@ def data_blob(blob_id):
         #A PARTIR DE AQUI HABRA QUE LLAMAR A LA CAPA DE NEGOCIO PARA QUE SUSTITUYA LOS DATOS DEL BLOB_ID O NO
         return Response('', status = 200)
     
+@app.route(f'{ROOT_API}/blob/<blob_id>/roles', methods = ('GET', 'PATCH', 'POST'))
+def roles_blob(blob_id):
+    auth_token = request.headers.get('AuthToken')
+    roles = []
+    
+    if not auth_token:
+        #AQUI HAY QUE LLAMAR A LA CAPA DE NEGOCIO PARA VERIFICAR SI ESE AUTH_TOKEN ESTA PERMITIDO
+        return Response('', status = 401)
+    
+    if request.method == 'GET':
+        #LLAMARIAS A LA CAPA DE NEGOCIO PARA QUE HAGA LA OPERACION, Y ESTA A SU VEZ, SI LOS PERMISOS SON CORRECTOS, LLAMARIA A LA CAPA DE PERSISTENCIA
+        return Response('', status = 200)
+   
+    if request.method == 'PATCH' or request.method == 'POST':
+        if not request.json: #Si no tiene un JSON, la peticon esta mal formulada
+            Response('', status = 401)
+        
+        # roles = request.json.get('writable_by')
+        # print(roles)
+
+        return Response('', status = 200)
+            
+
+@app.route(f'{ROOT_API}/blob/<blob_id>/name', methods = ('GET', 'PATCH', 'POST'))
+def name_blob(blob_id):
+    auth_token = request.headers.get('AuthToken')
+    
+    if not auth_token:
+        #AQUI HAY QUE LLAMAR A LA CAPA DE NEGOCIO PARA VERIFICAR SI ESE AUTH_TOKEN ESTA PERMITIDO
+        return Response('', status = 401)
+    
+    if request.method == 'GET':
+        #LLAMARIAS A LA CAPA DE NEGOCIO PARA QUE HAGA LA OPERACION, Y ESTA A SU VEZ, SI LOS PERMISOS SON CORRECTOS, LLAMARIA A LA CAPA DE PERSISTENCIA
+        return Response('', status = 200)
+   
+    if request.method == 'PATCH' or request.method == 'POST':
+        if not request.json: #Si no tiene un JSON, la peticon esta mal formulada
+            Response('', status = 401)
+        
+        # name = request.json.get('writable_by')
+        # print(roles)
+
+        return Response('', status = 200)
 
 if __name__ == '__main__':
-    app.run(host = f'{args.listening}', port =args.port)
+    app.run(host = f'{args.listening}', port = args.port, debug = True)
