@@ -4,7 +4,6 @@ import base64
 import os
 from typing import Union
 
-
 class BlobNotFound(Exception):
     """Excepción para cuando un Blob_ID no se encuentra en el JSON."""
     def __init__(self, blob_id):
