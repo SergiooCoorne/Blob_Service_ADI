@@ -16,7 +16,7 @@ def test_blob_1(blob_created):
 
 @pytest.fixture
 def blob():
-    obj = Persistence('./test/json_test.json')
+    obj = Persistence()
     blob_id, rtr = obj.create_blob('Test_1', ['rol_test1', 'rol_test_2'], 'Test_Create_blob'.encode())
     yield obj, blob_id, rtr
 

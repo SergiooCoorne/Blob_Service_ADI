@@ -74,6 +74,17 @@ class Persistence:
 
         return data
     
+    def get_blob_roles(self, blob_id: str) -> list[str]:
+        #Leemos los datos del JSON
+        with open(self.root_persistence, 'r') as persistence_json:
+            data_json = json.load(persistence_json)
+        
+        #Comprobamos que el Blob_ID que nos estan pasando esta dentro del archivo JSON
+        if not blob_id in data_json:
+            raise BlobNotFound(blob_id)
+        
+        return data_json[blob_id]['Blob_Roles']
+    
     def delete_blob(self, blob_id: str) -> bool:
         rtn = False #Valor que se va a devolver para verificar si se ha hecho de forma correcta la operacion o no
 
