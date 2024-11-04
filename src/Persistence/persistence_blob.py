@@ -11,17 +11,21 @@ class BlobNotFound(Exception):
         self.blob_id = blob_id
 
 class Blob:
-    def __init__(self, name: str, roles: list[str], data: bytes):
+    def __init__(self, name: str, owner: str, roles: list[str], data: bytes):
         self.name = name
+        self.owner = owner
         self.blob_id = secrets.token_hex(8)
         self.roles = roles
         self.data = data
-    
+        
     def get_blob_id(self) -> str:
         return self.blob_id
     
     def get_blob_name(self) -> str:
         return self.name
+    
+    def get_blob_owner(self) -> str:
+        return self.owner
     
     def get_blob_data(self) -> bytes:
         return self.data
@@ -36,9 +40,9 @@ class Persistence:
             with open(self.root_persistence, 'w') as f:
                 json.dump({}, f)  # Escribir un objeto JSON vacío
 
-    def create_blob(self, name: str, roles: list[str], data: bytes) -> Union[str, bool]:
+    def create_blob(self, name: str, owner: str, roles: list[str], data: bytes) -> Union[str, bool]:
         rtn = False #Valor que se va a devolver para verificar si se ha hecho de forma correcta la operacion o no
-        new_blob = Blob(name, roles, data)
+        new_blob = Blob(name, owner, roles, data)
         data_encoded = base64.b64encode(new_blob.get_blob_data()).decode('utf-8')
     
         #Leemos los datos del JSON
@@ -48,19 +52,19 @@ class Persistence:
         # Agreamos ahora el nuevo Blob cuya clave sera su Blob_ID, y de esta manera lo podemos identificar en el JSON
         blob_data = {
             "Blob_Name": new_blob.get_blob_name(),
+            "Blob_Owner": new_blob.get_blob_owner(),
             "Blob_Roles": new_blob.get_blob_roles(),
             "Blob_Data": data_encoded
         }
         data_json[new_blob.get_blob_id()] = blob_data
 
-       
         with open(self.root_persistence, 'w', encoding='utf-8') as persistence_json:
             json.dump(data_json, persistence_json, indent=4)
             rtn = True
 
         return new_blob.get_blob_id(), rtn
 
-    def get_blob_data(self, blob_id: str) -> bytes:
+    def get_data_blob(self, blob_id: str) -> bytes:
         #Leemos los datos del JSON
         with open(self.root_persistence, 'r') as persistence_json:
             data_json = json.load(persistence_json)
@@ -73,6 +77,39 @@ class Persistence:
         #print(f'Data del blob ID: {blob_id}: {data}')
 
         return data
+    
+    def get_name_blob(self, blob_id: str) -> str:
+        #Leemos los datos del JSON
+        with open(self.root_persistence, 'r') as persistence_json:
+            data_json = json.load(persistence_json)
+        
+        #Comprobamos que el Blob_ID que nos estan pasando esta dentro del archivo JSON
+        if not blob_id in data_json:
+            raise BlobNotFound(blob_id)
+        
+        return data_json[blob_id]['Blob_Name']
+    
+    def get_owner_blob(self, blob_id: str) -> str:
+        #Leemos los datos del JSON
+        with open(self.root_persistence, 'r') as persistence_json:
+            data_json = json.load(persistence_json)
+        
+        #Comprobamos que el Blob_ID que nos estan pasando esta dentro del archivo JSON
+        if not blob_id in data_json:
+            raise BlobNotFound(blob_id)
+        
+        return data_json[blob_id]['Blob_Owner']
+    
+    def get_roles_blob(self, blob_id: str) -> list[str]:
+        #Leemos los datos del JSON
+        with open(self.root_persistence, 'r') as persistence_json:
+            data_json = json.load(persistence_json)
+        
+        #Comprobamos que el Blob_ID que nos estan pasando esta dentro del archivo JSON
+        if not blob_id in data_json:
+            raise BlobNotFound(blob_id)
+        
+        return data_json[blob_id]['Blob_Roles']
     
     def delete_blob(self, blob_id: str) -> bool:
         rtn = False #Valor que se va a devolver para verificar si se ha hecho de forma correcta la operacion o no
@@ -95,7 +132,29 @@ class Persistence:
 
         return rtn
     
-    def modify_blob(self, blob_id: str, new_name: str, new_roles: list[str], new_data: bytes) -> bool:
+    def modify_data_blob(self, blob_id: str, new_data: bytes) -> bool:
+        rtr = False #Valor que se va a devolver para verificar si se ha hecho de forma correcta la operacion o no
+
+        #Leeemos el JSON para obtener los datos que hay en el
+        with open(self.root_persistence, 'r') as persistence_json:
+            data_json = json.load(persistence_json)
+
+        #Comprobamos que el Blob_ID esta dentro del JSON
+        if not blob_id in data_json:
+            raise BlobNotFound(blob_id)
+        
+        #Procedemos a modificar lo que se quiere modificar el Blob
+        new_data_encoded = base64.b64encode(new_data).decode('utf-8')
+        data_json[blob_id]["Blob_Data"] = new_data_encoded
+    
+        #Escribimos del nuevo el JSON
+        with open(self.root_persistence, 'w') as persistence_json:
+            json.dump(data_json, persistence_json, indent = 4)
+            rtr = True
+
+        return rtr
+    
+    def modify_name_blob(self, blob_id: str, new_name: str) -> bool:
         rtr = False #Valor que se va a devolver para verificar si se ha hecho de forma correcta la operacion o no
 
         #Leeemos el JSON para obtener los datos que hay en el
@@ -108,22 +167,52 @@ class Persistence:
         
         #Procedemos a modificar lo que se quiere modificar el Blob
         data_json[blob_id]["Blob_Name"] = new_name
-        data_json[blob_id]["Blob_Roles"] = new_roles
-        data_json[blob_id]["Blob_Data"] = base64.b64encode(new_data).decode('utf-8')
-
+    
         #Escribimos del nuevo el JSON
         with open(self.root_persistence, 'w') as persistence_json:
             json.dump(data_json, persistence_json, indent = 4)
             rtr = True
 
         return rtr
-
-# if __name__ == '__main__':
-#     persistencia = Persistence('./persistence.json')
-#     blob_id_1 = persistencia.create_blob('Blob_1', ['admin', 'user'], data = 'Hola'.encode())
-#     blob_id_2 = persistencia.create_blob('Blob_2', ['admin', 'user'], data = 'Adios'.encode())
-#     print(persistencia.get_blob_data(blob_id_1))
-#     persistencia.delete_blob(blob_id_2)
-#     persistencia.modify_blob(blob_id_1, 'Blob_1_1', ['admin_1', 'user_2'], new_data = 'Adios'.encode())
-#     print(persistencia.get_blob_data(blob_id_1))
-
+    
+    def modify_owner_blob(self, blob_id: str, new_owner: str) -> bool:
+        rtr = False
+        
+        #Leeemos el JSON para obtener los datos que hay en el
+        with open(self.root_persistence, 'r') as persistence_json:
+            data_json = json.load(persistence_json)
+            
+        #Comprobamos que el Blob_ID esta dentro del JSON
+        if not blob_id in data_json:
+            raise BlobNotFound(blob_id)
+        
+        #Procedemos a modificar lo que se quiere modificar el Blob
+        data_json[blob_id]["Blob_Owner"] = new_owner
+        
+        #Escribimos del nuevo el JSON
+        with open(self.root_persistence, 'w') as persistence_json:
+            json.dump(data_json, persistence_json, indent = 4)
+            rtr = True
+            
+        return rtr
+    
+    def modify_roles_blob(self, blob_id: str, new_roles: list[str]) -> bool:
+        rtr = False
+        
+        #Leeemos el JSON para obtener los datos que hay en el
+        with open(self.root_persistence, 'r') as persistence_json:
+            data_json = json.load(persistence_json)
+            
+        #Comprobamos que el Blob_ID esta dentro del JSON
+        if not blob_id in data_json:
+            raise BlobNotFound(blob_id)
+        
+        #Procedemos a modificar lo que se quiere modificar el Blob
+        data_json[blob_id]["Blob_Roles"] = new_roles
+        
+        #Escribimos del nuevo el JSON
+        with open(self.root_persistence, 'w') as persistence_json:
+            json.dump(data_json, persistence_json, indent = 4)
+            rtr = True
+            
+        return rtr
