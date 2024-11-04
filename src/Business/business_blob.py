@@ -1,8 +1,9 @@
-from src.Persistence.persistence_blob import Persistence, BlobNotFound 
-#from persistence_blob import Persistence, BlobNotFound #AVERIGUAR PORQUE NO ME DEJA IMPORTAR EL MODULO SI PONGO DE RUTA 'src.Persistence.persistence_blob'
+import sys
+sys.path.append("/home/sergio/Escritorio/Uni/Primer_Cutri/ADI/Trabajo_1_ADI")
+
+from src.Persistence.persistence_blob import Persistence 
 from typing import List, Union
 import requests
-import time
 
 URL_TOKEN_SERVICE = 'http://127.0.0.1:3002'
 
@@ -155,3 +156,7 @@ def get_data_token(authToken) -> Union[List[str], str]:
     owner = response.json().get('username')
         
     return roles, owner
+
+if __name__ == '__main__':
+    obj = Business()
+    obj.put_blob('name_1', 'owner_yo', ['rol_1', 'rol_2'], 'path')

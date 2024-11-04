@@ -1,6 +1,5 @@
 import secrets
 import json
-import base64
 import os
 from typing import Union
 
@@ -43,8 +42,7 @@ class Persistence:
     def create_blob(self, name: str, owner: str, roles: list[str], file: str) -> Union[str, bool]:
         rtn = False #Valor que se va a devolver para verificar si se ha hecho de forma correcta la operacion o no
         new_blob = Blob(name, owner, roles, file)
-        #data_encoded = base64.b64encode(new_blob.get_blob_data()).decode('utf-8')
-    
+        
         #Leemos los datos del JSON
         with open(self.root_persistence, 'r',) as persistence_json:
             data_json = json.load(persistence_json)
@@ -144,7 +142,6 @@ class Persistence:
             raise BlobNotFound(blob_id)
         
         #Procedemos a modificar lo que se quiere modificar el Blob
-        #new_data_encoded = base64.b64encode(new_data).decode('utf-8')
         data_json[blob_id]["Blob_File"] = new_file
     
         #Escribimos del nuevo el JSON

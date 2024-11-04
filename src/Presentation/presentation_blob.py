@@ -1,7 +1,8 @@
-#!/usr/bine/env python
-
+import sys
+sys.path.append("/home/sergio/Escritorio/Uni/Primer_Cutri/ADI/Trabajo_1_ADI") #Linea necesario para que el interprete de python coja bien las rutas a la hora de lanzar la aplicacion
 import argparse
 from flask import Flask, Response, request
+from src.Business.business_blob import Business
 
 app = Flask(__name__)
 
@@ -12,6 +13,12 @@ parser.add_argument('-l', '--listening', type = str, required = True, help = "Di
 args = parser.parse_args()
 
 ROOT_API = '/api/v1'
+business = Business()
+
+# class Presentation:
+
+#     def __init__(self):
+#         self.business = Business()
 
 '''Recurso de la API correspondiente con "API_ROOT/blob" '''
 @app.route(f'{ROOT_API}/blob', methods = ('PUT',))
@@ -27,17 +34,14 @@ def put_blob():
         return Response('Bad Request', status = 400)
     
     # #Obtencion de los datos del JSON
-    # name = request.json.get('name')
-    # writer = request.json.get('writable_by')
-    # data = request.json.get('multipart')
+    name = request.json.get('name')
+    roles = request.json.get('writable_by')
+    owner = 'owner_test'
+    file = request.json.get('multipart')
     
-    # #Impresion de los datos para comprobar que estan llegando bien
-    # print(f'Name: {name}, Data: {data}')
-    # for i in writer:
-    #     print(f'Writer: {i}')
-    
-    #AQUI IRIA LA LLAMADA A LA CAPA DE NEGOCIO PARA AVERIGUAR SI LA OPERACION SE PUEDE REALIZAR O NO
-    return Response(f'Created. Data: ', status=201)
+    blob_id = business.put_blob(name, owner, roles, file) #El blobID se usara pare relacionar el Blob_ID con el File subido
+
+    return Response(f'{blob_id}', status=201)
 
 '''Recurso de la API correspondiente con "API_ROOT/blob/{blob_id}" '''
 @app.route(f'{ROOT_API}/blob/<blob_id>', methods = ('DELETE',))
@@ -80,7 +84,7 @@ def roles_blob(blob_id):
     if request.method == 'GET':
         #LLAMARIAS A LA CAPA DE NEGOCIO PARA QUE HAGA LA OPERACION, Y ESTA A SU VEZ, SI LOS PERMISOS SON CORRECTOS, LLAMARIA A LA CAPA DE PERSISTENCIA
         return Response('', status = 200)
-   
+
     if request.method == 'PATCH' or request.method == 'POST':
         if not request.json: #Si no tiene un JSON, la peticon esta mal formulada
             Response('', status = 401)
@@ -102,7 +106,7 @@ def name_blob(blob_id):
     if request.method == 'GET':
         #LLAMARIAS A LA CAPA DE NEGOCIO PARA QUE HAGA LA OPERACION, Y ESTA A SU VEZ, SI LOS PERMISOS SON CORRECTOS, LLAMARIA A LA CAPA DE PERSISTENCIA
         return Response('', status = 200)
-   
+
     if request.method == 'PATCH' or request.method == 'POST':
         if not request.json: #Si no tiene un JSON, la peticon esta mal formulada
             Response('', status = 401)

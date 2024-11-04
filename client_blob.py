@@ -13,14 +13,14 @@ class Client:
     def __init__(self, root_api: str) -> None:
         self.root_api = root_api
         
-    def put_blob(self, auth_token: str, name: str, writer: List[str], data: str) -> None:
+    def put_blob(self, auth_token: str, name: str, writer: List[str], file: str) -> None:
         response = requests.put(
             f'{self.root_api}/blob',
             headers = {'AuthToken': auth_token},
             json = {
                 'name': name,
                 'writable_by': writer,
-                'multipart': data
+                'multipart': file
             }
         )
         _assert_status_ok_(response.status_code)
@@ -132,11 +132,11 @@ class Client:
 if __name__ == '__main__':
     client = Client('http://localhost:1234/api/v1')
     writted_by = ['Luis', 'Paco', 'Antonio']
-    client.put_blob('1234', 'Sergio', writted_by, '1234')
-    client.delet_blob('1234567889')
-    client.get_blob('1234567889')
-    client.post_patch_blob('1234567889', '1234', 'POST')
-    client.post_patch_blob('4564651534', '5678', 'PATCH')
-    client.get_roles_blob('12345678')
-    client.post_patch_roles_blob('1345756', ['paco', 'sergio', 'alejandro'], 'POST')
-    client.post_patch_roles_blob('1345756', ['paco', 'sergio', 'alejandro'], 'PATCH')
+    client.put_blob('token_for_admin', 'Blob_1', writted_by, 'path')
+    # client.delet_blob('1234567889')
+    # client.get_blob('1234567889')
+    # client.post_patch_blob('1234567889', '1234', 'POST')
+    # client.post_patch_blob('4564651534', '5678', 'PATCH')
+    # client.get_roles_blob('12345678')
+    # client.post_patch_roles_blob('1345756', ['paco', 'sergio', 'alejandro'], 'POST')
+    # client.post_patch_roles_blob('1345756', ['paco', 'sergio', 'alejandro'], 'PATCH')
