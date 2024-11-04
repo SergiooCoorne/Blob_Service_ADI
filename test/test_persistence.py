@@ -4,13 +4,13 @@ import os
 
 @pytest.fixture
 def blob_created():
-    blob_created = Blob('Test_1', 'owner_1',['rol_test1', 'rol_test_2'], 'Test_Create_blob'.encode())
+    blob_created = Blob('Test_1', 'owner_1',['rol_test1', 'rol_test_2'], 'file_1')
     yield blob_created
     
 @pytest.fixture
 def blob():
     obj = Persistence()
-    blob_id, rtr = obj.create_blob('Test_1', 'owner_1', ['rol_test1', 'rol_test_2'], 'Test_Create_blob'.encode())
+    blob_id, rtr = obj.create_blob('Test_1', 'owner_1', ['rol_test1', 'rol_test_2'], 'file_1')
     yield obj, blob_id, rtr
     
 @pytest.fixture(scope='session', autouse = True)
@@ -25,18 +25,18 @@ def test_atributes_blob_(blob_created):
     assert instance_blob.get_blob_name is not None
     assert instance_blob.get_blob_owner is not None
     assert instance_blob.get_blob_roles is not None
-    assert instance_blob.get_blob_data is not None    
+    assert instance_blob.get_blob_file is not None    
     
 def test_create_blob(blob):
     obj, blob_id, rtr = blob
     assert blob_id is not None
     assert rtr is True
     
-def test_get_data_blob(blob):
+def test_get_file_blob(blob):
     obj, blob_id, rtr = blob
 
-    data = obj.get_data_blob(blob_id)
-    assert data is not None
+    file = obj.get_file_blob(blob_id)
+    assert file is not None
     
 def test_get_name_blob(blob):
     obj, blob_id, rtr = blob
@@ -63,10 +63,10 @@ def test_delete_blob(blob):
 
     assert rtr is True
     
-def test_modify_data_blob(blob):
+def test_modify_file_blob(blob):
     obj, blob_id, rtr = blob
 
-    rtr = obj.modify_data_blob(blob_id, 'Test_Modify_Data'.encode())
+    rtr = obj.modify_file_blob(blob_id, 'Test_Modify_File')
 
     assert rtr is True
     
@@ -91,12 +91,12 @@ def test_modify_roles_blob(blob):
 
     assert rtr is True
     
-def test_exception_get_data_blob(blob):
+def test_exception_get_file_blob(blob):
     obj, blob_id, rtr = blob
 
     blob_id = 'dbjqkbdiq'
     with pytest.raises(BlobNotFound, match=f"Blob con ID '{blob_id}' no encontrado"):
-        obj.get_data_blob(blob_id)    
+        obj.get_file_blob(blob_id)    
         
 def test_exception_get_name_blob(blob):
     obj, blob_id, rtr = blob
@@ -126,10 +126,10 @@ def test_exception_detele_blob(blob):
     with pytest.raises(BlobNotFound, match=f"Blob con ID '{blob_id}' no encontrado"):
         obj.delete_blob(blob_id)
         
-def test_exception_modify_data_blob(blob):
+def test_exception_modify_file_blob(blob):
     obj, blob_id, rtr = blob
     with pytest.raises(BlobNotFound, match=f"Blob con ID '{4378294}' no encontrado"):
-        obj.modify_data_blob('4378294', 'Test_Modify_Data'.encode())
+        obj.modify_file_blob('4378294', 'Test_Modify_Data')
         
 def test_exception_modify_name_blob(blob):
     obj, blob_id, rtr = blob

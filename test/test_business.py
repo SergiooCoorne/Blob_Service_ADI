@@ -6,7 +6,7 @@ import os
 @pytest.fixture
 def business():
     obj = Business()
-    blob_id = obj.put_blob('blob_1', 'owner_1', ['admin'], 'data_1'.encode())
+    blob_id = obj.put_blob('blob_1', 'owner_1', ['admin'], 'file_1')
     yield obj, blob_id
     
 def test_create_business(business):
@@ -18,7 +18,7 @@ def test_create_business(business):
         
 def test_put_blob(business):
     obj, blob_id = business
-    blob_id_created = obj.put_blob('blob_1', 'owner_1', ['admin'], 'data_1'.encode())
+    blob_id_created = obj.put_blob('blob_1', 'owner_1', ['admin'], 'file_1')
     assert blob_id_created is not None
     
 def test_detele_blob(business):
@@ -27,11 +27,11 @@ def test_detele_blob(business):
     code = obj.delete_blob(blob_id, 'token_for_admin')
     assert code is 200
     
-def test_get_data_blob(business):
+def test_get_file_blob(business):
     obj, blob_id = business
         
-    data, code = obj.get_data_blob(blob_id)
-    assert data is not None
+    file, code = obj.get_file_blob(blob_id)
+    assert file is not None
     assert code is 200
     
 def test_get_name_blob(business):
@@ -55,10 +55,10 @@ def get_roles_blob(business):
     assert roles is not None
     assert code is 200
     
-def test_modify_data_blob(business):
+def test_modify_file_blob(business):
     obj, blob_id = business
         
-    code = obj.modify_data_blob(blob_id, 'token_for_admin', 'new_data'.encode())
+    code = obj.modify_file_blob(blob_id, 'token_for_admin', 'new_file')
     assert code is 200
     
 def test_modify_name_blob(business):

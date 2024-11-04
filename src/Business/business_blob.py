@@ -8,7 +8,7 @@ URL_TOKEN_SERVICE = 'http://127.0.0.1:3002'
 
 class Forbidden(Exception):
     """Excepción para cuando un Blob_ID no se encuentra en el JSON."""
-    def __init__(self, blob_id):
+    def __init__(self, blob_id, roles):
         super().__init__(f"{blob_id}, {roles}")
         self.blob_id = blob_id
 
@@ -16,8 +16,8 @@ class Business:
     def __init__(self):
         self.persistence = Persistence()
         
-    def put_blob(self, name: str, owner: str, roles: List[str], data: bytes) -> str:
-        blob_id, rtr = self.persistence.create_blob(name, owner, roles, data)
+    def put_blob(self, name: str, owner: str, roles: List[str], file: str) -> str:
+        blob_id, rtr = self.persistence.create_blob(name, owner, roles, file)
         if rtr is True:
             return blob_id
         
@@ -43,10 +43,10 @@ class Business:
         else:
             raise Forbidden(blob_id, roles_blob)
         
-    def get_data_blob(self, blob_id: str) -> Union[bytes, int]:
-        data = self.persistence.get_data_blob(blob_id)
-        if data:
-            return data, 200
+    def get_file_blob(self, blob_id: str) -> Union[bytes, int]:
+        file = self.persistence.get_file_blob(blob_id)
+        if file:
+            return file, 200
         else:
             return None, 404
         
@@ -71,7 +71,7 @@ class Business:
         else:
             return None, 404
          
-    def modify_data_blob(self, blob_id: str, authToken: str, new_data: bytes) -> int:
+    def modify_file_blob(self, blob_id: str, authToken: str, new_file: str) -> int:
         permission = False
         roles_user, name_user = get_data_token(authToken)
         roles_blob = self.persistence.get_roles_blob(blob_id)
@@ -82,7 +82,7 @@ class Business:
                 break
             
         if permission:
-            rtr = self.persistence.modify_data_blob(blob_id, new_data)
+            rtr = self.persistence.modify_file_blob(blob_id, new_file)
             
             if rtr:
                 return 200
