@@ -2,6 +2,11 @@ import secrets
 import json
 import os
 from typing import Union
+import getpass
+from requests_toolbelt import MultipartEncoder
+
+name_system = getpass.getuser()
+UPLOAD_DIRECTORY = f'/home/{name_system}/persistence_dir'
 
 class BlobNotFound(Exception):
     """Excepción para cuando un Blob_ID no se encuentra en el JSON."""
@@ -34,14 +39,16 @@ class Blob:
 
 class Persistence:
     def __init__(self):
-        self.root_persistence = './json_test.json'
+        self.root_persistence = f'/home/{name_system}/json_test.json'
         if not os.path.exists(self.root_persistence):
             with open(self.root_persistence, 'w') as f:
-                json.dump({}, f)  # Escribir un objeto JSON vacío
+                json.dump({}, f)  # Escribimos un objeto JSON vacío
 
-    def create_blob(self, name: str, owner: str, roles: list[str], file: str) -> Union[str, bool]:
+    def create_blob(self, name: str, owner: str, roles: list[str], file_path: str, file) -> Union[str, bool]:
         rtn = False #Valor que se va a devolver para verificar si se ha hecho de forma correcta la operacion o no
-        new_blob = Blob(name, owner, roles, file)
+        new_blob = Blob(name, owner, roles, file_path) #Creamos el Blob para tener referencia al archivo que vamos a subir
+        
+        file.save(file_path) #Subimos del archivo
         
         #Leemos los datos del JSON
         with open(self.root_persistence, 'r',) as persistence_json:
@@ -52,7 +59,7 @@ class Persistence:
             "Blob_Name": new_blob.get_blob_name(),
             "Blob_Owner": new_blob.get_blob_owner(),
             "Blob_Roles": new_blob.get_blob_roles(),
-            "Blob_File": file
+            "Blob_Path_File": file_path
         }
         data_json[new_blob.get_blob_id()] = blob_data
 
@@ -61,8 +68,41 @@ class Persistence:
             rtn = True
 
         return new_blob.get_blob_id(), rtn
+    
+    def modify_file_blob(self, blob_id: str, new_file: str) -> bool:
+        rtr = False #Valor que se va a devolver para verificar si se ha hecho de forma correcta la operacion o no
 
-    def get_file_blob(self, blob_id: str) -> bytes:
+        #Primero borramos el archivo asociado al Blob
+        if os.path.exists(self.get_path_file_blob(blob_id)):
+            os.remove(self.get_path_file_blob(blob_id))
+        
+        #Ahora sacamos la ruta completa del nuevo file
+        filename = os.path.basename(new_file.filename) 
+        #Juntamos la ruta de nuestro directorio de persistencia con el nombre del archivo
+        file_path = os.path.join(UPLOAD_DIRECTORY, filename)
+        
+        #Leeemos el JSON para obtener los datos que hay en el
+        with open(self.root_persistence, 'r') as persistence_json:
+            data_json = json.load(persistence_json)
+
+        #Comprobamos que el Blob_ID esta dentro del JSON
+        if not blob_id in data_json:
+            raise BlobNotFound(blob_id)
+
+        #Procedemos a modificar lo que se quiere modificar el Blob
+        data_json[blob_id]["Blob_Path_File"] = file_path
+        
+        #Volvemos a escribir en el JSON
+        with open(self.root_persistence, 'w') as persistence_json:
+            json.dump(data_json, persistence_json, indent = 4)
+            rtr = True
+
+        #Por ultimo, guardamos el archivo        
+        new_file.save(file_path)
+        
+        return rtr
+    
+    def get_path_file_blob(self, blob_id: str) -> bytes:
         #Leemos los datos del JSON
         with open(self.root_persistence, 'r') as persistence_json:
             data_json = json.load(persistence_json)
@@ -71,8 +111,7 @@ class Persistence:
         if not blob_id in data_json:
             raise BlobNotFound(blob_id)
         
-        data = data_json[blob_id]['Blob_File']
-        #print(f'Data del blob ID: {blob_id}: {data}')
+        data = data_json[blob_id]['Blob_Path_File']
 
         return data
     
@@ -86,70 +125,6 @@ class Persistence:
             raise BlobNotFound(blob_id)
         
         return data_json[blob_id]['Blob_Name']
-    
-    def get_owner_blob(self, blob_id: str) -> str:
-        #Leemos los datos del JSON
-        with open(self.root_persistence, 'r') as persistence_json:
-            data_json = json.load(persistence_json)
-        
-        #Comprobamos que el Blob_ID que nos estan pasando esta dentro del archivo JSON
-        if not blob_id in data_json:
-            raise BlobNotFound(blob_id)
-        
-        return data_json[blob_id]['Blob_Owner']
-    
-    def get_roles_blob(self, blob_id: str) -> list[str]:
-        #Leemos los datos del JSON
-        with open(self.root_persistence, 'r') as persistence_json:
-            data_json = json.load(persistence_json)
-        
-        #Comprobamos que el Blob_ID que nos estan pasando esta dentro del archivo JSON
-        if not blob_id in data_json:
-            raise BlobNotFound(blob_id)
-        
-        return data_json[blob_id]['Blob_Roles']
-    
-    def delete_blob(self, blob_id: str) -> bool:
-        rtn = False #Valor que se va a devolver para verificar si se ha hecho de forma correcta la operacion o no
-
-        #Leemos los datos del JSON
-        with open(self.root_persistence, 'r') as persistence_json:
-            data_json = json.load(persistence_json)
-
-        #Comprobamos que el Blob_ID esta dentro del JSON
-        if not blob_id in data_json:
-            raise BlobNotFound(blob_id)
-        
-        #Borramos el blob_ID del JSON
-        del data_json[blob_id]
-
-        #Escribimos del nuevo el JSON
-        with open(self.root_persistence, 'w') as persistence_json:
-            json.dump(data_json, persistence_json, indent = 4)
-            rtn = True
-
-        return rtn
-    
-    def modify_file_blob(self, blob_id: str, new_file: str) -> bool:
-        rtr = False #Valor que se va a devolver para verificar si se ha hecho de forma correcta la operacion o no
-
-        #Leeemos el JSON para obtener los datos que hay en el
-        with open(self.root_persistence, 'r') as persistence_json:
-            data_json = json.load(persistence_json)
-
-        #Comprobamos que el Blob_ID esta dentro del JSON
-        if not blob_id in data_json:
-            raise BlobNotFound(blob_id)
-        
-        #Procedemos a modificar lo que se quiere modificar el Blob
-        data_json[blob_id]["Blob_File"] = new_file
-    
-        #Escribimos del nuevo el JSON
-        with open(self.root_persistence, 'w') as persistence_json:
-            json.dump(data_json, persistence_json, indent = 4)
-            rtr = True
-
-        return rtr
     
     def modify_name_blob(self, blob_id: str, new_name: str) -> bool:
         rtr = False #Valor que se va a devolver para verificar si se ha hecho de forma correcta la operacion o no
@@ -172,26 +147,16 @@ class Persistence:
 
         return rtr
     
-    def modify_owner_blob(self, blob_id: str, new_owner: str) -> bool:
-        rtr = False
-        
-        #Leeemos el JSON para obtener los datos que hay en el
+    def get_roles_blob(self, blob_id: str) -> list[str]:
+        #Leemos los datos del JSON
         with open(self.root_persistence, 'r') as persistence_json:
             data_json = json.load(persistence_json)
-            
-        #Comprobamos que el Blob_ID esta dentro del JSON
+        
+        #Comprobamos que el Blob_ID que nos estan pasando esta dentro del archivo JSON
         if not blob_id in data_json:
             raise BlobNotFound(blob_id)
         
-        #Procedemos a modificar lo que se quiere modificar el Blob
-        data_json[blob_id]["Blob_Owner"] = new_owner
-        
-        #Escribimos del nuevo el JSON
-        with open(self.root_persistence, 'w') as persistence_json:
-            json.dump(data_json, persistence_json, indent = 4)
-            rtr = True
-            
-        return rtr
+        return data_json[blob_id]['Blob_Roles']
     
     def modify_roles_blob(self, blob_id: str, new_roles: list[str]) -> bool:
         rtr = False
@@ -213,3 +178,25 @@ class Persistence:
             rtr = True
             
         return rtr
+    
+    def delete_blob(self, blob_id: str) -> bool:
+        rtn = False #Valor que se va a devolver para verificar si se ha hecho de forma correcta la operacion o no
+
+        #Leemos los datos del JSON
+        with open(self.root_persistence, 'r') as persistence_json:
+            data_json = json.load(persistence_json)
+
+        #Comprobamos que el Blob_ID esta dentro del JSON
+        if not blob_id in data_json:
+            raise BlobNotFound(blob_id)
+        
+        #Borramos el blob_ID del JSON
+        del data_json[blob_id]
+        os.remove(self.get_path_file_blob(blob_id)) #Borramos el archivo del Blob
+
+        #Escribimos del nuevo el JSON
+        with open(self.root_persistence, 'w') as persistence_json:
+            json.dump(data_json, persistence_json, indent = 4)
+            rtn = True
+
+        return rtn

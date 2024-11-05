@@ -21,60 +21,60 @@ def test_put_blob(business):
     blob_id_created = obj.put_blob('blob_1', 'owner_1', ['admin'], 'file_1')
     assert blob_id_created is not None
     
-def test_detele_blob(business):
+def test_detele_blob_OK(business):
     obj, blob_id = business
         
-    code = obj.delete_blob(blob_id, 'token_for_admin')
+    code = obj.delete_blob(blob_id, 'token_for_admin', ['admin'])
     assert code is 200
     
-def test_get_file_blob(business):
+def test_get_file_blob_OK(business):
     obj, blob_id = business
         
-    file, code = obj.get_file_blob(blob_id)
+    file, code = obj.get_file_blob(blob_id, 'token_for_admin', ['admin'])
     assert file is not None
     assert code is 200
     
-def test_get_name_blob(business):
+def test_get_name_blob_OK(business):
     obj, blob_id = business
         
-    name, code = obj.get_name_blob(blob_id)
+    name, code = obj.get_name_blob(blob_id, 'token_for_admin', ['admin'])
     assert name is not None
     assert code is 200
     
-def test_get_owner_blob(business):
+def test_get_owner_blob_OK(business):
     obj, blob_id = business
         
-    owner, code = obj.get_owner_blob(blob_id)
+    owner, code = obj.get_owner_blob(blob_id, 'token_for_admin', ['admin'])
     assert owner is not None
     assert code is 200
     
-def get_roles_blob(business):
+def get_roles_blob_OK(business):
     obj, blob_id = business
         
-    roles, code = obj.get_roles_blob(blob_id)
+    roles, code = obj.get_roles_blob(blob_id, 'token_for_admin', ['admin'])
     assert roles is not None
     assert code is 200
     
-def test_modify_file_blob(business):
+def test_modify_file_blob_OK(business):
     obj, blob_id = business
         
-    code = obj.modify_file_blob(blob_id, 'token_for_admin', 'new_file')
+    code = obj.modify_file_blob(blob_id, 'token_for_admin', ['admin'], 'new_file')
     assert code is 200
     
-def test_modify_name_blob(business):
+def test_modify_name_blob_OK(business):
     obj, blob_id = business
         
-    code = obj.modify_name_blob(blob_id, 'token_for_admin', 'new_name')
+    code = obj.modify_name_blob(blob_id, 'token_for_admin', ['admin'], 'new_name')
     assert code is 200
     
-def test_modify_owner_blob(business):
+def test_modify_owner_blob_OK(business):
     obj, blob_id = business
         
-    code = obj.modify_owner_blob(blob_id, 'token_for_admin', 'new_owner')
+    code = obj.modify_owner_blob(blob_id, 'token_for_admin', ['admin'], 'new_owner')
     assert code is 200
     
 def test_modify_roles_blob(business):
     obj, blob_id = business
         
-    code = obj.modify_roles_blob(blob_id, 'token_for_admin', ['new_role'])
+    code = obj.modify_roles_blob(blob_id, 'token_for_admin', ['admin'], ['new_role'])
     assert code is 200
