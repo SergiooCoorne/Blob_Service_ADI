@@ -3,7 +3,7 @@ import requests
 from requests_toolbelt import MultipartEncoder
 
 def _assert_status_ok_(status_code):
-    if status_code not in [200, 201, 204, 400, 401]:
+    if status_code not in [200, 201, 204, 400, 401, 404]:
         raise RuntimeError('Unknown response from API')
     else:
         return True
@@ -167,7 +167,7 @@ if __name__ == '__main__':
     #blob_id = client.put_blob('token_for_admin', 'blob_1', writted_by, '/home/sergio/Escritorio/prueba.txt')
     # client.delete_blob('2e93083dbde9f18a')
     #client.get_blob('38f1ad88e7f84c80')
-    #client.post_patch_blob('38f1ad88e7f84c80', 'token_for_admin', '/home/sergio/Escritorio/prueba2.txt', 'POST')
+    client.post_patch_blob('06db2bec3c10c78', 'token_for_admin', '/home/sergio/Escritorio/prueba2.txt', 'POST')
     #client.post_patch_blob('38f1ad88e7f84c80', 'token_for_admin', '/home/sergio/Escritorio/prueba.txt', 'PATCH')
     #client.get_roles_blob('38f1ad88e7f84c80')
     #client.post_patch_roles_blob('06db2be4c3c10c78', ['jesus', 'fran', 'jaime'], 'POST')

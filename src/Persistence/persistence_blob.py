@@ -11,8 +11,9 @@ UPLOAD_DIRECTORY = f'/home/{name_system}/persistence_dir'
 class BlobNotFound(Exception):
     """Excepción para cuando un Blob_ID no se encuentra en el JSON."""
     def __init__(self, blob_id):
-        super().__init__(f"Blob con ID '{blob_id}' no encontrado.")
+        super().__init__(f"Exception: Blob con ID '{blob_id}' no encontrado.")
         self.blob_id = blob_id
+        self.status_code = 404
 
 class Blob:
     def __init__(self, name: str, owner: str, roles: list[str], file: str):
@@ -85,10 +86,6 @@ class Persistence:
         with open(self.root_persistence, 'r') as persistence_json:
             data_json = json.load(persistence_json)
 
-        #Comprobamos que el Blob_ID esta dentro del JSON
-        if not blob_id in data_json:
-            raise BlobNotFound(blob_id)
-
         #Procedemos a modificar lo que se quiere modificar el Blob
         data_json[blob_id]["Blob_Path_File"] = file_path
         
@@ -106,11 +103,7 @@ class Persistence:
         #Leemos los datos del JSON
         with open(self.root_persistence, 'r') as persistence_json:
             data_json = json.load(persistence_json)
-        
-        #Comprobamos que el Blob_ID que nos estan pasando esta dentro del archivo JSON
-        if not blob_id in data_json:
-            raise BlobNotFound(blob_id)
-        
+
         data = data_json[blob_id]['Blob_Path_File']
 
         return data
@@ -119,11 +112,7 @@ class Persistence:
         #Leemos los datos del JSON
         with open(self.root_persistence, 'r') as persistence_json:
             data_json = json.load(persistence_json)
-        
-        #Comprobamos que el Blob_ID que nos estan pasando esta dentro del archivo JSON
-        if not blob_id in data_json:
-            raise BlobNotFound(blob_id)
-        
+
         return data_json[blob_id]['Blob_Name']
     
     def modify_name_blob(self, blob_id: str, new_name: str) -> bool:
@@ -133,10 +122,6 @@ class Persistence:
         with open(self.root_persistence, 'r') as persistence_json:
             data_json = json.load(persistence_json)
 
-        #Comprobamos que el Blob_ID esta dentro del JSON
-        if not blob_id in data_json:
-            raise BlobNotFound(blob_id)
-        
         #Procedemos a modificar lo que se quiere modificar el Blob
         data_json[blob_id]["Blob_Name"] = new_name
     
@@ -151,11 +136,7 @@ class Persistence:
         #Leemos los datos del JSON
         with open(self.root_persistence, 'r') as persistence_json:
             data_json = json.load(persistence_json)
-        
-        #Comprobamos que el Blob_ID que nos estan pasando esta dentro del archivo JSON
-        if not blob_id in data_json:
-            raise BlobNotFound(blob_id)
-        
+
         return data_json[blob_id]['Blob_Roles']
     
     def modify_roles_blob(self, blob_id: str, new_roles: list[str]) -> bool:
@@ -164,10 +145,6 @@ class Persistence:
         #Leeemos el JSON para obtener los datos que hay en el
         with open(self.root_persistence, 'r') as persistence_json:
             data_json = json.load(persistence_json)
-            
-        #Comprobamos que el Blob_ID esta dentro del JSON
-        if not blob_id in data_json:
-            raise BlobNotFound(blob_id)
         
         #Procedemos a modificar lo que se quiere modificar el Blob
         data_json[blob_id]["Blob_Roles"] = new_roles
@@ -185,10 +162,6 @@ class Persistence:
         #Leemos los datos del JSON
         with open(self.root_persistence, 'r') as persistence_json:
             data_json = json.load(persistence_json)
-
-        #Comprobamos que el Blob_ID esta dentro del JSON
-        if not blob_id in data_json:
-            raise BlobNotFound(blob_id)
         
         #Borramos el blob_ID del JSON
         del data_json[blob_id]
@@ -200,3 +173,14 @@ class Persistence:
             rtn = True
 
         return rtn
+    
+    def blob_exits(self, blob_id):
+        #Leemos los datos del JSON
+        with open(self.root_persistence, 'r') as persistence_json:
+            data_json = json.load(persistence_json)
+
+        #Comprobamos que el Blob_ID esta dentro del JSON
+        if not blob_id in data_json:
+            raise BlobNotFound(blob_id)
+        else:
+            return True

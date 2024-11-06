@@ -66,12 +66,14 @@ def delete_blob(blob_id):
     roles_user, name_user = get_data_token(auth_token)
     
     #Llamamos a la capa de negocio para que intente hacer la operacion de borrado
-    rtr = business.delete_blob(blob_id, auth_token, roles_user)
+    rtr_code = business.delete_blob(blob_id, auth_token, roles_user)
     
-    if rtr == 200:
-        return Response(f'Deleted {blob_id}', status = 200)    
-    else :
-        return Response(f'Unauthorized {blob_id}', status = 401)
+    if rtr_code == 200:
+        return Response('Modified', status=200)
+    elif rtr_code == 404:
+        return Response('Blob not found', status=404)
+    elif rtr_code == 401:
+        return Response('Unauthorized', status=401)
     
 '''Recurso de la API correspondiente con "API_ROOT/blob/{blob_id}/data" '''
 @app.route(f'{ROOT_API}/blob/<blob_id>/data', methods = ('GET','POST','PATCH'))
@@ -111,7 +113,11 @@ def data_blob(blob_id):
         rtr_code = business.modify_file_blob(blob_id, auth_token, roles_user, file)
         
         if rtr_code == 200:
-            return Response('Modified', status = 200)
+            return Response('Modified', status=200)
+        elif rtr_code == 404:
+            return Response('Blob not found', status=404)
+        elif rtr_code == 401:
+            return Response('Unauthorized', status=401)
         
 @app.route(f'{ROOT_API}/blob/<blob_id>/roles', methods = ('GET', 'PATCH', 'POST'))
 def roles_blob(blob_id):
@@ -136,7 +142,11 @@ def roles_blob(blob_id):
         rtr_code = business.modify_roles_blob(blob_id, auth_token, roles_user, new_roles)
         
         if rtr_code == 200:
-            return Response(f'Modified: {new_roles}', status = 200)
+            return Response('Modified', status=200)
+        elif rtr_code == 404:
+            return Response('Blob not found', status=404)
+        elif rtr_code == 401:
+            return Response('Unauthorized', status=401)
             
 
 @app.route(f'{ROOT_API}/blob/<blob_id>/name', methods = ('GET', 'PATCH', 'POST'))
@@ -166,7 +176,11 @@ def name_blob(blob_id):
         rtr_code = business.modify_name_blob(blob_id, auth_token, roles_user, new_name)
         
         if rtr_code == 200:
-            return Response(f'Modified: {new_name}', status = 200)
+            return Response('Modified', status=200)
+        elif rtr_code == 404:
+            return Response('Blob not found', status=404)
+        elif rtr_code == 401:
+            return Response('Unauthorized', status=401)
 
         return Response('', status = 200)
 
