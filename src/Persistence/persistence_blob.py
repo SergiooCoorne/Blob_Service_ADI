@@ -38,8 +38,11 @@ class Blob:
         return self.roles
 
 class Persistence:
-    def __init__(self):
-        self.root_persistence = f'/home/{name_system}/json_persistence.json'
+    def __init__(self, persistence_path: str):
+        self.root_persistence = f'{persistence_path}/persistence.json'
+
+        os.makedirs(os.path.dirname(self.root_persistence), exist_ok=True)
+
         if not os.path.exists(self.root_persistence):
             with open(self.root_persistence, 'w') as f:
                 json.dump({}, f)  # Escribimos un objeto JSON vacío
@@ -69,7 +72,7 @@ class Persistence:
 
         return new_blob.get_blob_id(), rtn
     
-    def modify_file_blob(self, blob_id: str, new_file: str) -> bool:
+    def modify_file_blob(self, blob_id: str, new_file: str, persistence_path: str) -> bool:
         rtr = False #Valor que se va a devolver para verificar si se ha hecho de forma correcta la operacion o no
 
         #Primero borramos el archivo asociado al Blob
@@ -79,7 +82,7 @@ class Persistence:
         #Ahora sacamos la ruta completa del nuevo file
         filename = os.path.basename(new_file.filename) 
         #Juntamos la ruta de nuestro directorio de persistencia con el nombre del archivo
-        file_path = os.path.join(UPLOAD_DIRECTORY, filename)
+        file_path = os.path.join(persistence_path, filename)
         
         #Leeemos el JSON para obtener los datos que hay en el
         with open(self.root_persistence, 'r') as persistence_json:

@@ -23,7 +23,7 @@ args = parser.parse_args()
 
 ROOT_API = '/api/v1'
 UPLOAD_DIRECTORY = f'{args.storage}/persistence_dir'
-business = Business()
+business = Business(UPLOAD_DIRECTORY)
 
 @app.route(f'{ROOT_API}/blob', methods=('PUT',))
 def put_blob():
@@ -117,7 +117,7 @@ def data_blob(blob_id):
         file_path = os.path.join(UPLOAD_DIRECTORY, filename)
         
         try:
-            rtr_code = business.modify_file_blob(blob_id, auth_token, roles_user, file)
+            rtr_code = business.modify_file_blob(blob_id, auth_token, roles_user, file, UPLOAD_DIRECTORY)
         except Exception as e:
             print(f'Exception: {str(e)}')
             return Response('Unauthorized', status=401)
