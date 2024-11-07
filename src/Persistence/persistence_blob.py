@@ -39,7 +39,7 @@ class Blob:
 
 class Persistence:
     def __init__(self):
-        self.root_persistence = f'/home/{name_system}/json_test.json'
+        self.root_persistence = f'/home/{name_system}/json_persistence.json'
         if not os.path.exists(self.root_persistence):
             with open(self.root_persistence, 'w') as f:
                 json.dump({}, f)  # Escribimos un objeto JSON vacío
@@ -155,13 +155,16 @@ class Persistence:
             
         return rtr
     
-    def delete_blob(self, blob_id: str) -> bool:
+    def delete_blob(self, blob_id: str) -> Union[int, bool]:
         rtn = False #Valor que se va a devolver para verificar si se ha hecho de forma correcta la operacion o no
 
         #Leemos los datos del JSON
         with open(self.root_persistence, 'r') as persistence_json:
             data_json = json.load(persistence_json)
         
+        if data_json[blob_id] == '':
+            return 204, False
+
         #Borramos el blob_ID del JSON
         del data_json[blob_id]
         os.remove(self.get_path_file_blob(blob_id)) #Borramos el archivo del Blob

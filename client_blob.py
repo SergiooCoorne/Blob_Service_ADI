@@ -33,26 +33,24 @@ class Client:
             )
 
         _assert_status_ok_(response.status_code)
-        print(f'Status Code Put_Data Request: {response.status_code}')
+        print(f'{response.status_code}, {response.text}')
     
-    def delete_blob(self, blob_id: str) -> None:
+    def delete_blob(self, blob_id: str, auth_token: str) -> None:
         response = requests.delete(
             f'{self.root_api}/blob/{blob_id}',
-            headers = {'AuthToken': 'token_for_admin'}
+            headers = {'AuthToken': auth_token}
         )
         if _assert_status_ok_(response.status_code):
             print(f'Status Code Delete_Data Request: {response.status_code}')
     
-    def get_blob(self, blob_id: str) -> None:
+    def get_blob(self, blob_id: str, auth_token: str) -> None:
         response = requests.get(
             f'{self.root_api}/blob/{blob_id}/data',
-            headers = {'AuthToken': 'token_for_admin'}
+            headers = {'AuthToken': auth_token}
         )
         _assert_status_ok_(response.status_code)
-        print(f'Status Code Get_Data Request: {response.status_code}')
         file = response.content
-        
-        print(f'File: {file}')    
+        print(f'{response.status_code}, File: {file}')    
 
     def post_patch_blob(self, blob_id: str, auth_token: str, file_path: str, request: str) -> None:
         if request == 'POST':
@@ -73,7 +71,7 @@ class Client:
                 )
 
             _assert_status_ok_(response.status_code)
-            print(f'Status Code POST_Data Request: {response.status_code}')
+            print(f'{response.status_code}, {response.text}')
         
         elif request == 'PATCH':
             with open(file_path, 'rb') as file:
@@ -92,25 +90,27 @@ class Client:
                     data = multipart
                 )
             _assert_status_ok_(response.status_code)
-            print(f'Status Code Patch_Data Request: {response.status_code}')
+            print(f'{response.status_code}, {response.text}')
             
         else:
             raise ValueError('Unknown request')
     
-    def get_roles_blob(self, blob_id: str) -> None:
+    def get_roles_blob(self, blob_id: str, auth_token: str) -> None:
         response = requests.get(
             f'{self.root_api}/blob/{blob_id}/roles',
-            headers = {'AuthToken': 'token_for_admin'},)
+            headers = {'AuthToken': auth_token},)
         
         _assert_status_ok_(response.status_code)
-        print(f'{response.status_code}, data: {response.json()}')
-        roles = response.json()
+        if response.status_code == 200:
+            print(f'{response.status_code}, data: {response.json()}')
+        else:
+            print(f'{response.status_code}, {response.text}')
 
-    def post_patch_roles_blob(self, blob_id: str, new_roles: List[str], request: str) -> None:
+    def post_patch_roles_blob(self, blob_id: str, auth_token:str ,new_roles: List[str], request: str) -> None:
         if request == 'PATCH':
             response = requests.patch(
                 f'{self.root_api}/blob/{blob_id}/roles',
-                headers = {'AuthToken': 'token_for_admin'},
+                headers = {'AuthToken': auth_token},
                 json = {
                     'writable_by': new_roles
                 }
@@ -121,7 +121,7 @@ class Client:
         if request == 'POST':
             response = requests.post(
                 f'{self.root_api}/blob/{blob_id}/roles',
-                headers = {'AuthToken': 'token_for_admin'},
+                headers = {'AuthToken': auth_token},
                 json = {
                     'writable_by': new_roles
                 }
@@ -129,19 +129,21 @@ class Client:
             _assert_status_ok_(response.status_code)
             print(f'Status Code Post_Name Request: {response.status_code}')
 
-    def get_name_blob(self, blob_id: str) -> None:
+    def get_name_blob(self, blob_id: str, auth_token: str) -> None:
         response = requests.get(
             f'{self.root_api}/blob/{blob_id}/name',
-            headers = {'AuthToken': 'token_for_admin'},)
+            headers = {'AuthToken': auth_token},)
         _assert_status_ok_(response.status_code)
-        name = response.text
-        print(f'{response.status_code}. Name: {name}')
+        if response.status_code == 200:
+            print(f'{response.status_code}, name: {response.text}')
+        else:
+            print(f'{response.status_code}, {response.text}')
 
-    def post_patch_names_blob(self, blob_id: str, name: str, request: str) -> None:
+    def post_patch_names_blob(self, blob_id: str, auth_token: str, name: str, request: str) -> None:
         if request == 'PATCH':
             response = requests.patch(
                 f'{self.root_api}/blob/{blob_id}/name',
-                headers = {'AuthToken': 'token_for_admin'},
+                headers = {'AuthToken': auth_token},
                 json = {
                     'name': name
                 }
@@ -152,25 +154,25 @@ class Client:
         if request == 'POST':
             response = requests.post(
                 f'{self.root_api}/blob/{blob_id}/name',
-                headers = {'AuthToken': 'token_for_admin'},
+                headers = {'AuthToken': auth_token},
                 json = {
                     'name': name
                 }
             )
             _assert_status_ok_(response.status_code)
-            print(f'{response.status_code}.{response.text})')
+            print(f'{response.status_code}, {response.text}')
     
 
 if __name__ == '__main__':
     client = Client('http://localhost:1234/api/v1')
     #writted_by = ['admin', 'Paco', 'Antonio']
     #blob_id = client.put_blob('token_for_admin', 'blob_1', writted_by, '/home/sergio/Escritorio/prueba.txt')
-    # client.delete_blob('2e93083dbde9f18a')
-    #client.get_blob('38f1ad88e7f84c80')
-    client.post_patch_blob('06db2bec3c10c78', 'token_for_admin', '/home/sergio/Escritorio/prueba2.txt', 'POST')
-    #client.post_patch_blob('38f1ad88e7f84c80', 'token_for_admin', '/home/sergio/Escritorio/prueba.txt', 'PATCH')
-    #client.get_roles_blob('38f1ad88e7f84c80')
-    #client.post_patch_roles_blob('06db2be4c3c10c78', ['jesus', 'fran', 'jaime'], 'POST')
+    #client.delete_blob('2a2ca74c595979a0', 'token_for_admin')
+    #client.get_blob('36ef169ddf93b54d', 'token_for_admin')
+    #client.post_patch_blob('36ef169ddf93b54d', 'token_for_admin', '/home/sergio/Escritorio/prueba.txt', 'POST')
+    #client.post_patch_blob('36ef169ddf93b54d', 'token_for_admin', '/home/sergio/Escritorio/prueba.txt', 'PATCH')
+    #client.get_roles_blob('36ef169ddf93b54d', 'token_for_user')
+    #client.post_patch_roles_blob('36ef169ddf93b54d', 'token_for_admin' ,['jesus', 'fran', 'jaime'], 'POST')
     #client.post_patch_roles_blob('06db2be4c3c10c78', ['paco', 'admin', 'antonio'], 'PATCH')
-    #client.get_name_blob('06db2be4c3c10c78')
-    #client.post_patch_names_blob('06db2be4c3c10c78', 'blob_2', 'POST')
+    #client.get_name_blob('36ef169ddf93b54d', 'token_for_user')
+    #client.post_patch_names_blob('36ef169ddf93b54', 'token_for_user', 'blob', 'POST')

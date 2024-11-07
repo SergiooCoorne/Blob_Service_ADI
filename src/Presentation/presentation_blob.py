@@ -15,13 +15,14 @@ URL_TOKEN_SERVICE = 'http://127.0.0.1:3002'
 app = Flask(__name__)
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-p', '--port', type = int, required = True, help = "Numero de puerto")
+parser.add_argument('-p', '--port', type = int, required = True, help = "Número de puerto")
 parser.add_argument('-l', '--listening', type = str, required = True, help = "Direccion donde se producirá la escucha")
+parser.add_argument('-s', '--storage', type = str, required = True, help = "Ruta donde se almacenará la persistencia")
 
 args = parser.parse_args()
 
 ROOT_API = '/api/v1'
-UPLOAD_DIRECTORY = f'/home/{name_system}/persistence_dir'
+UPLOAD_DIRECTORY = f'{args.storage}/persistence_dir'
 business = Business()
 
 @app.route(f'{ROOT_API}/blob', methods=('PUT',))
@@ -65,14 +66,16 @@ def delete_blob(blob_id):
     roles_user, name_user = get_data_token(auth_token)
     
     #Llamamos a la capa de negocio para que intente hacer la operacion de borrado
-    rtr_code = business.delete_blob(blob_id, auth_token, roles_user)
-    
+    try:
+        rtr_code = business.delete_blob(blob_id, auth_token, roles_user)
+    except Exception as e:
+        print(f'Exception: {str(e)}')
+        return Response('Unauthorized', status=401)
+
     if rtr_code == 200:
         return Response('Modified', status=200)
     elif rtr_code == 404:
-        return Response('Blob not found', status=404)
-    elif rtr_code == 401:
-        return Response('Unauthorized', status=401)
+        return Response('Blob not found', status=404)        
     
 '''Recurso de la API correspondiente con "API_ROOT/blob/{blob_id}/data" '''
 @app.route(f'{ROOT_API}/blob/<blob_id>/data', methods = ('GET','POST','PATCH'))
@@ -85,8 +88,12 @@ def data_blob(blob_id):
     roles_user, name_user = get_data_token(auth_token)
     
     if request.method == 'GET':
-        file_path, code_rtr = business.get_file_blob(blob_id, auth_token, roles_user)
-        
+        try:
+            file_path, code_rtr = business.get_file_blob(blob_id, auth_token, roles_user)
+        except Exception as e:
+            print(f'Exception: {str(e)}')
+            return Response('Unauthorized', status = 401)
+    
         with open(file_path, 'rb') as file:
             file_content = file.read()
 
@@ -100,7 +107,7 @@ def data_blob(blob_id):
                 
         # Comprobación del archivo en la petición
         if 'file' not in request.files:
-            return Response('Bad Request: No file part', status=400)
+            return Response('No content', status=204)
         
         #Sacamos el file de la peticion
         file = request.files['file']
@@ -109,79 +116,100 @@ def data_blob(blob_id):
         #Juntamos la ruta de nuestro directorio de persistencia con el nombre del archivo
         file_path = os.path.join(UPLOAD_DIRECTORY, filename)
         
-        rtr_code = business.modify_file_blob(blob_id, auth_token, roles_user, file)
-        
+        try:
+            rtr_code = business.modify_file_blob(blob_id, auth_token, roles_user, file)
+        except Exception as e:
+            print(f'Exception: {str(e)}')
+            return Response('Unauthorized', status=401)
+
         if rtr_code == 200:
             return Response('Modified', status=200)
         elif rtr_code == 404:
             return Response('Blob not found', status=404)
-        elif rtr_code == 401:
-            return Response('Unauthorized', status=401)
+        else:
+            return Response('',status=500)
         
 @app.route(f'{ROOT_API}/blob/<blob_id>/roles', methods = ('GET', 'PATCH', 'POST'))
 def roles_blob(blob_id):
     auth_token = request.headers.get('AuthToken')
+    
     if not auth_token:
         return Response('', status = 401)
     
     roles_user, name_user = get_data_token(auth_token)
     
     if request.method == 'GET':
-        roles, rtr_code = business.get_roles_blob(blob_id, auth_token, roles_user)
-        
+        try:
+            roles, rtr_code = business.get_roles_blob(blob_id, auth_token, roles_user)
+        except Exception as e:
+            print(f'Exception: {str(e)}')
+            return Response('Unauthorized', status=401)
+
         if rtr_code == 200:
             response = Response(json.dumps(roles), status=200, mimetype='application/json')
             return response
+        elif rtr_code == 404:
+            return Response('Blob not found', status=404)
 
     if request.method == 'PATCH' or request.method == 'POST':
         #Sacamos los roles del user que quiere modificar el Blob
         roles_user, name_user = get_data_token(auth_token)
         new_roles = request.json.get('writable_by')
         
-        rtr_code = business.modify_roles_blob(blob_id, auth_token, roles_user, new_roles)
-        
+        try:
+            rtr_code = business.modify_roles_blob(blob_id, auth_token, roles_user, new_roles)
+        except Exception as e:
+            print(f'Exception: {str(e)}')
+            return Response('Unauthorized', status=401)
+
         if rtr_code == 200:
             return Response('Modified', status=200)
         elif rtr_code == 404:
             return Response('Blob not found', status=404)
-        elif rtr_code == 401:
-            return Response('Unauthorized', status=401)
-            
+        else:
+            return Response('',status=500)
 
 @app.route(f'{ROOT_API}/blob/<blob_id>/name', methods = ('GET', 'PATCH', 'POST'))
 def name_blob(blob_id):
     auth_token = request.headers.get('AuthToken')
     
     if not auth_token:
-        #AQUI HAY QUE LLAMAR A LA CAPA DE NEGOCIO PARA VERIFICAR SI ESE AUTH_TOKEN ESTA PERMITIDO
-        return Response('', status = 401)
+        return Response('Bad Request', status = 40)
     
     if request.method == 'GET':
         roles_user, name_user = get_data_token(auth_token)
         
-        name_blob, rtr_code = business.get_name_blob(blob_id, auth_token, roles_user)
-        
+        try:
+            name_blob, rtr_code = business.get_name_blob(blob_id, auth_token, roles_user)
+        except Exception as e:
+            print(f'Exception: {str(e)}')
+            return Response(f'Unauthorized', status=401)
+
         if rtr_code == 200:
             return Response(f'{name_blob}', status = 200)
+        elif rtr_code == 404:
+            return Response('Blob not found', status = 404)
         else:
-            return Response('', status = 401)
-
+            return Response('', 500)
 
     if request.method == 'PATCH' or request.method == 'POST':
         #Sacamos los roles del user que quiere modificar el Blob
         roles_user, name_user = get_data_token(auth_token)
         new_name = request.json.get('name')
         
-        rtr_code = business.modify_name_blob(blob_id, auth_token, roles_user, new_name)
-        
+        try:
+            rtr_code = business.modify_name_blob(blob_id, auth_token, roles_user, new_name)
+        except Exception as e:
+            print(f'Exception: {str(e)}')
+            return Response('Unauthorized', status=401)
+
         if rtr_code == 200:
             return Response('Modified', status=200)
         elif rtr_code == 404:
             return Response('Blob not found', status=404)
-        elif rtr_code == 401:
-            return Response('Unauthorized', status=401)
+        else:
+            return Response('', 500)
 
-        return Response('', status = 200)
 
 def get_data_token(authToken) -> Union[List[str], str]:
     response = requests.get(
