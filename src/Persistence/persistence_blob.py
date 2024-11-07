@@ -3,7 +3,6 @@ import json
 import os
 from typing import Union
 import getpass
-from requests_toolbelt import MultipartEncoder
 
 name_system = getpass.getuser()
 UPLOAD_DIRECTORY = f'/home/{name_system}/persistence_dir'

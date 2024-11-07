@@ -3,8 +3,6 @@ sys.path.append("/home/sergio/Escritorio/Uni/Primer_Cutri/ADI/Trabajo_1_ADI")
 
 from src.Persistence.persistence_blob import Persistence, BlobNotFound 
 from typing import List, Union
-import requests
-from requests_toolbelt import MultipartEncoder
 
 class Forbidden(Exception):
     """Excepción para cuando un Blob_ID no se encuentra en el JSON."""
@@ -102,7 +100,7 @@ class Business:
         
         roles_blob = self.persistence.get_roles_blob(blob_id)        
         for role_user in roles_user:
-            if role_user in roles_blob or rol_user == 'admin':
+            if role_user in roles_blob or role_user == 'admin':
                 permission = True
                 break
         
@@ -123,7 +121,7 @@ class Business:
         roles_blob = self.persistence.get_roles_blob(blob_id)
         
         for role_user in roles_user:
-            if role_user in roles_blob or rol_user == 'admin':
+            if role_user in roles_blob or role_user == 'admin':
                 permission = True
                 break
             
