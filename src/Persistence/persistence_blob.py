@@ -2,10 +2,6 @@ import secrets
 import json
 import os
 from typing import Union
-import getpass
-
-name_system = getpass.getuser()
-UPLOAD_DIRECTORY = f'/home/{name_system}/persistence_dir'
 
 class BlobNotFound(Exception):
     """Excepción para cuando un Blob_ID no se encuentra en el JSON."""
@@ -15,12 +11,12 @@ class BlobNotFound(Exception):
         self.status_code = 404
 
 class Blob:
-    def __init__(self, name: str, owner: str, roles: list[str], file: str):
+    def __init__(self, name: str, owner: str, roles: list[str], file_path: str):
         self.name = name
         self.owner = owner
         self.blob_id = secrets.token_hex(8)
         self.roles = roles
-        self.file = file
+        self.file_path = file_path
         
     def get_blob_id(self) -> str:
         return self.blob_id
@@ -31,8 +27,8 @@ class Blob:
     def get_blob_owner(self) -> str:
         return self.owner
     
-    def get_blob_file(self) -> str:
-        return self.file
+    def get_path_file_blob(self) -> str:
+        return self.file_path
     
     def get_blob_roles(self) -> list:
         return self.roles
@@ -101,7 +97,7 @@ class Persistence:
         
         return rtr
     
-    def get_path_file_blob(self, blob_id: str) -> bytes:
+    def get_path_file_blob(self, blob_id: str) -> str:
         #Leemos los datos del JSON
         with open(self.root_persistence, 'r') as persistence_json:
             data_json = json.load(persistence_json)

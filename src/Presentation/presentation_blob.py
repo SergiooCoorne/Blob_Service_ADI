@@ -50,6 +50,8 @@ def put_blob():
     roles = request.form.get('writable_by')
     owner = request.form.get('owner')
     
+    print(f'File: {file}')
+
     blob_id = business.put_blob(name, owner, roles, file_path, file)
 
     return Response(f'blob_id: {blob_id}', status=201)
