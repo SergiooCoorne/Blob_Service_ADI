@@ -164,11 +164,11 @@ class Client:
     
 
 if __name__ == '__main__':
-    client = Client('http://localhost:1234/api/v1')
+    client = Client('http://localhost:3003/api/v1')
     # writted_by = ['admin', 'Paco', 'Antonio']
     # blob_id = client.put_blob('token_for_admin', 'blob_1', writted_by, '/home/sergio/Escritorio/prueba.txt')
     #client.delete_blob('ab05c47b1dcdd045', 'token_for_admin')
-    #client.get_blob('36ef169ddf93b54d', 'token_for_admin')
+    client.get_blob('321343352532', 'token_for_admin')
     #client.post_patch_blob('36ef169ddf93b54d', 'token_for_admin', '/home/sergio/Escritorio/prueba.txt', 'POST')
     #client.post_patch_blob('36ef169ddf93b54d', 'token_for_admin', '/home/sergio/Escritorio/prueba.txt', 'PATCH')
     #client.get_roles_blob('36ef169ddf93b54d', 'token_for_user')

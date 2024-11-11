@@ -1,6 +1,6 @@
 import sys
 import os
-sys.path.append("/home/sergio/Escritorio/VSCodeLinux/ADI/Trabajo_1_ADI") #Linea necesario para que el interprete de python coja bien las rutas a la hora de lanzar la aplicacion
+sys.path.append("/home/sergio/Escritorio/Uni/Primer_Cutri/ADI/Trabajo_1_ADI") #Linea necesario para que el interprete de python coja bien las rutas a la hora de lanzar la aplicacion
 import argparse
 from flask import Flask, Response, request
 from typing import List, Union
@@ -100,12 +100,15 @@ def data_blob(blob_id):
             print(f'Exception: {str(e)}')
             return Response('Unauthorized', status = 401)
     
-        with open(file_path, 'rb') as file:
-            file_content = file.read()
+        if code_rtr == 200:
+            with open(file_path, 'rb') as file:
+                file_content = file.read()
 
-        response = Response(file_content, status=200, mimetype='application/octet-stream')
-        response.headers['Content-Disposition'] = f'attachment; filename={file_path}'
-        return response
+            response = Response(file_content, status=200, mimetype='application/octet-stream')
+            response.headers['Content-Disposition'] = f'attachment; filename={file_path}'
+            return response
+        elif code_rtr == 404:
+            return Response('Blob not found', status=404)
         
     if request.method == 'POST' or request.method == 'PATCH':
         #Sacamos los roles del user que quiere modificar el Blob
@@ -176,7 +179,7 @@ def name_blob(blob_id):
     auth_token = request.headers.get('AuthToken')
     
     if not auth_token:
-        return Response('Bad Request', status = 40)
+        return Response('Bad Request', status = 401)
     
     if request.method == 'GET':
         roles_user, name_user = get_data_token(auth_token)

@@ -80,7 +80,7 @@ def test_get_file_blob_permission_FAIL(business):
 def test_get_file_blob_exits_FAIL(business):
     obj, blob_id = business
         
-    code = obj.get_file_blob('edfadawdawdaw', 'token_for_admin', ['admin'])
+    path, code = obj.get_file_blob('edfadawdawdaw', 'token_for_admin', ['admin'])
     assert code == 404
 
 

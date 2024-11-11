@@ -55,10 +55,10 @@ class Business:
             self.persistence.blob_exits(blob_id)    
         except Exception as e:
             print(str(e))
-            return e.status_code
+            return None, e.status_code
         
         roles_blob = self.persistence.get_roles_blob(blob_id)
-        
+                
         for role_user in roles_user:
             if role_user in roles_blob or role_user == 'admin':
                 permission = True
