@@ -15,9 +15,13 @@ URL_TOKEN_SERVICE = 'http://127.0.0.1:3002'
 app = Flask(__name__)
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-p', '--port', type = int, required = True, help = "Número de puerto")
-parser.add_argument('-l', '--listening', type = str, required = True, help = "Direccion donde se producirá la escucha")
-parser.add_argument('-s', '--storage', type = str, required = True, help = "Ruta donde se almacenará la persistencia")
+# parser.add_argument('-p', '--port', type = int, required = True, help = "Número de puerto")
+# parser.add_argument('-l', '--listening', type = str, required = True, help = "Direccion donde se producirá la escucha")
+# parser.add_argument('-s', '--storage', type = str, required = True, help = "Ruta donde se almacenará la persistencia")
+
+parser.add_argument('-p', '--port', type=int, default=3003, help="Número de puerto")
+parser.add_argument('-l', '--listening', type=str, default="127.0.0.1", help="Dirección donde se producirá la escucha")
+parser.add_argument('-s', '--storage', type=str, default=f'/home/{name_system}', help="Ruta donde se almacenará la persistencia")
 
 args = parser.parse_args()
 
@@ -113,13 +117,9 @@ def data_blob(blob_id):
         
         #Sacamos el file de la peticion
         file = request.files['file']
-        #Sacamos el nombre del archivo
-        filename = os.path.basename(file.filename) 
-        #Juntamos la ruta de nuestro directorio de persistencia con el nombre del archivo
-        file_path = os.path.join(UPLOAD_DIRECTORY, filename)
         
         try:
-            rtr_code = business.modify_file_blob(blob_id, auth_token, roles_user, file, UPLOAD_DIRECTORY)
+            rtr_code = business.modify_file_blob(blob_id, auth_token, roles_user, file)
         except Exception as e:
             print(f'Exception: {str(e)}')
             return Response('Unauthorized', status=401)
@@ -226,5 +226,8 @@ def get_data_token(authToken) -> Union[List[str], str]:
         
     return roles, owner
 
+def main():
+    app.run(host=f'{args.listening}', port=args.port, debug=True)
+
 if __name__ == '__main__':
-    app.run(host = f'{args.listening}', port = args.port, debug = True)
+    main()

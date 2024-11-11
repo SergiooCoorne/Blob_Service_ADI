@@ -106,7 +106,7 @@ def test_modify_file_blob(blob, setup_and_cleanup):
     mock_file.save = Mock()
     mock_file.filename = "test_file.txt" 
     
-    rtr = obj.modify_file_blob(blob_id, mock_file, test_dir)
+    rtr = obj.modify_file_blob(blob_id, mock_file)
 
     assert rtr is True
     

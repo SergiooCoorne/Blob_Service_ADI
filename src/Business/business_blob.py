@@ -13,6 +13,7 @@ class Forbidden(Exception):
 
 class Business:
     def __init__(self, persistence_path: str):
+        self.persistence_path = persistence_path
         self.persistence = Persistence(persistence_path)
         
     def put_blob(self, name: str, owner: str, roles: List[str], file_path: str, file) -> str:
@@ -109,7 +110,7 @@ class Business:
         else:
             raise Forbidden(authToken, roles_user)
         
-    def modify_file_blob(self, blob_id: str, authToken: str, roles_user: List[str], new_file: str, persistence_path: str) -> int:
+    def modify_file_blob(self, blob_id: str, authToken: str, roles_user: List[str], new_file: str) -> int:
         permission = False
         
         try:
@@ -126,7 +127,7 @@ class Business:
                 break
             
         if permission:
-            rtr = self.persistence.modify_file_blob(blob_id, new_file, persistence_path)
+            rtr = self.persistence.modify_file_blob(blob_id, new_file)
             if rtr:
                 return 200
             else:
