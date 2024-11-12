@@ -15,13 +15,9 @@ URL_TOKEN_SERVICE = 'http://127.0.0.1:3002'
 app = Flask(__name__)
 
 parser = argparse.ArgumentParser()
-# parser.add_argument('-p', '--port', type = int, required = True, help = "Número de puerto")
-# parser.add_argument('-l', '--listening', type = str, required = True, help = "Direccion donde se producirá la escucha")
-# parser.add_argument('-s', '--storage', type = str, required = True, help = "Ruta donde se almacenará la persistencia")
-
-parser.add_argument('-p', '--port', type=int, default=3003, help="Número de puerto")
-parser.add_argument('-l', '--listening', type=str, default="127.0.0.1", help="Dirección donde se producirá la escucha")
-parser.add_argument('-s', '--storage', type=str, default=f'/home/{name_system}', help="Ruta donde se almacenará la persistencia")
+parser.add_argument('-p', '--port', type=int, default=3003, help="Número de puerto (por defecto 3003)")
+parser.add_argument('-l', '--listening', type=str, default='0.0.0.0', help="Dirección donde se producirá la escucha (por defecto '0.0.0.0')")
+parser.add_argument('-s', '--storage', type=str, default=f'/home/{name_system}', help=f'Ruta donde se almacenará la persistencia (por defecto /home/{name_system})')
 
 args = parser.parse_args()
 
