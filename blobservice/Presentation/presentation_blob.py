@@ -9,7 +9,7 @@ import json
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
 sys.path.append(project_root)
-from src.Business.business_blob import Business
+from blobservice.Business.business_blob import Business
 
 name_system = getpass.getuser()
 URL_TOKEN_SERVICE = 'http://127.0.0.1:3002'

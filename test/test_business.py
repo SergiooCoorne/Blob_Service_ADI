@@ -1,5 +1,5 @@
-from src.Business.business_blob import Business, Forbidden
-from src.Persistence.persistence_blob import Blob
+from blobservice.Business.business_blob import Business, Forbidden
+from blobservice.Persistence.persistence_blob import Blob
 import pytest
 import shutil
 import os

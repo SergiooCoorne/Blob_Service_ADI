@@ -1,4 +1,4 @@
-from src.Persistence.persistence_blob import Blob, Persistence, BlobNotFound
+from blobservice.Persistence.persistence_blob import Blob, Persistence, BlobNotFound
 import pytest
 import shutil
 import os
