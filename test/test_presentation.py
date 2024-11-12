@@ -161,6 +161,7 @@ def test_delete_blob_not_exits(client):
             'AuthToken': 'token_for_admin',
         }
     )
+    assert response.text == 'Blob not found'
     assert response.status_code == 404
 
 def test_get_blob(client, blob_for_test):
@@ -192,6 +193,7 @@ def test_get_blob_not_exits(client, blob_for_test):
             'AuthToken': 'token_for_admin',
         }
     )
+    assert response.text == 'Blob not found'
     assert response.status_code == 404
 
 def test_post_blob(client, blob_for_test):
@@ -220,6 +222,56 @@ def test_post_blob(client, blob_for_test):
     os.remove('./test_file3.txt')
     assert response.status_code == 200
 
+def test_post_blob_without_token(client, blob_for_test):
+    blob_id_1, blob_id_2 = blob_for_test
+
+    #Creamos un archivo de prueba para subirlo
+    with open('./test_file3.txt', 'w') as file:
+        file.write('TEST')
+
+    with open('./test_file3.txt', 'rb') as file:
+        multipart = MultipartEncoder(
+            fields={
+                'file': ('./test_file3.txt', file, 'application/octet-stream')
+            }
+        )
+    
+        response = client.post(
+            f'/api/v1/blob/{blob_id_2}/data',
+            headers = {
+                'Content-Type': multipart.content_type
+            },
+            data = multipart
+        )
+    #Eliminamos el archivo de prueba
+    os.remove('./test_file3.txt')
+    assert response.status_code == 401
+
+def test_post_blob_not_exits(client):
+    #Creamos un archivo de prueba para subirlo
+    with open('./test_file3.txt', 'w') as file:
+        file.write('TEST')
+
+    with open('./test_file3.txt', 'rb') as file:
+        multipart = MultipartEncoder(
+            fields={
+                'file': ('./test_file3.txt', file, 'application/octet-stream')
+            }
+        )
+    
+        response = client.post(
+            f'/api/v1/blob/6321798/data',
+            headers = {
+                'AuthToken': 'token_for_admin',
+                'Content-Type': multipart.content_type
+            },
+            data = multipart
+        )
+    #Eliminamos el archivo de prueba
+    os.remove('./test_file3.txt')
+    assert response.text == 'Blob not found'
+    assert response.status_code == 404
+
 def test_get_roles_blob(client, blob_for_test):
     blob_id_1, blob_id_2 = blob_for_test
 
@@ -240,6 +292,16 @@ def test_get_roles_blob_without_token(client):
     )
     assert response.status_code == 401
 
+def test_get_roles_blob_not_exits(client):
+    response = client.get(
+        f'/api/v1/blob/687687572/roles',
+        headers = {
+            'AuthToken': 'token_for_admin'
+        },
+    )
+    assert response.text == 'Blob not found'
+    assert response.status_code == 404
+
 def test_post_roles_blob(client, blob_for_test):
     blob_id_1, blob_id_2 = blob_for_test
 
@@ -253,6 +315,31 @@ def test_post_roles_blob(client, blob_for_test):
                 }
     )
     assert response.status_code == 200
+
+def test_post_roles_blob_without_token(client, blob_for_test):
+    blob_id_1, blob_id_2 = blob_for_test
+
+    response = client.post(
+        f'/api/v1/blob/{blob_id_2}/roles',
+        headers = {},
+        json = {
+                    'writable_by': ['jesus', 'fran', 'jaime']
+                }
+    )
+    assert response.status_code == 401
+
+def test_post_roles_blob_not_exits(client):
+    response = client.post(
+        f'/api/v1/blob/6432473280/roles',
+        headers = {
+            'AuthToken': 'token_for_admin'
+        },
+        json = {
+                    'writable_by': ['jesus', 'fran', 'jaime']
+                }
+    )
+    assert response.text == 'Blob not found'
+    assert response.status_code == 404
 
 def test_get_name_blob(client, blob_for_test):
     blob_id_1, blob_id_2 = blob_for_test
@@ -276,3 +363,53 @@ def test_get_name_blob_without_token(client, blob_for_test):
     )
     assert response.status_code == 401
 
+def test_get_name_blob_not_exits(client):
+    response = client.get(
+        f'/api/v1/blob/4738247329/name',
+        headers = {
+            'AuthToken': 'token_for_admin'
+        },
+    ) 
+    assert response.text == 'Blob not found'
+    assert response.status_code == 404
+
+def test_post_name_blob(client, blob_for_test):
+    blob_id_1, blob_id_2 = blob_for_test
+
+    response = client.post(
+        f'/api/v1/blob/{blob_id_2}/name',
+        headers = {
+            'AuthToken': 'token_for_admin'
+        },
+        json = {
+                    'name': 'test_name'
+        }
+    )
+    assert response.status_code == 200
+
+def test_post_name_blob_without_token(client, blob_for_test):
+    blob_id_1, blob_id_2 = blob_for_test
+
+    response = client.post(
+        f'/api/v1/blob/{blob_id_2}/name',
+        headers = {},
+        json = {
+                    'name': 'test_name'
+        }
+    )
+    assert response.status_code == 401
+
+def test_post_name_blob_not_exits(client, blob_for_test):
+    blob_id_1, blob_id_2 = blob_for_test
+
+    response = client.post(
+        f'/api/v1/blob/4732564289/name',
+        headers = {
+            'AuthToken': 'token_for_admin'
+        },
+        json = {
+                    'name': 'test_name'
+        }
+    )
+    assert response.text == 'Blob not found'
+    assert response.status_code == 404
