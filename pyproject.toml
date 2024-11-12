@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "blob_service"
+version = "0.1.0" 
+authors = [
+  { name="Sergio Cornejo Prieto", email="Sergio.Cornejo@alu.uclm.es" },
+]
+description = "API REST for Blob service"
+requires-python = ">=3.10"
+dependencies = [
+    'flask',
+    'requests_toolbelt'
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Operating System :: OS Independent",
+]
+license = "GPL-3.0-only"
+
+[project.scripts]
+blob_service = "src.command_handlers:run_server"
+
+[project.optional-dependencies]
+tests = ["pytest"]
