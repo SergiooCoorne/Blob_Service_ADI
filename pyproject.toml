@@ -26,26 +26,6 @@ blob_service = "blobservice.command_handlers:run_server"
 
 [project.optional-dependencies]
 tests = ["pytest"]
-linters = ["mypy", "pylint", "ruff"]
-
-# Tools configuration
-[tool.ruff]
-line-length = 120
-
-[tool.ruff.lint]
-# Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
-# Enable pydocstyle too
-# Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
-# McCabe complexity (`C901`) by default.
-select = ["E", "W", "F", "D"]
-ignore = ["D203", "D213"]
-
-[tool.pylint.TYPECHECK]
-ignored-classes = ["Flask"]
-
-[[tool.mypy.overrides]]
-module = ["flask"]
-ignore_missing_imports = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["blobservice"]
