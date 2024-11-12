@@ -162,17 +162,17 @@ class Client:
             _assert_status_ok_(response.status_code)
             print(f'{response.status_code}, {response.text}')
     
-
-if __name__ == '__main__':
-    client = Client('http://localhost:3003/api/v1')
-    # writted_by = ['admin', 'Paco', 'Antonio']
-    # blob_id = client.put_blob('token_for_admin', 'blob_1', writted_by, '/home/sergio/Escritorio/prueba.txt')
-    #client.delete_blob('ab05c47b1dcdd045', 'token_for_admin')
-    client.get_blob('321343352532', 'token_for_admin')
-    #client.post_patch_blob('36ef169ddf93b54d', 'token_for_admin', '/home/sergio/Escritorio/prueba.txt', 'POST')
+# if __name__ == '__main__':
+#     client = Client('http://localhost:3003/api/v1')
+    #writted_by = ['admin', 'Paco', 'Antonio']
+    # blob_id = client.put_blob('token_for_admin', 'blob_2', writted_by, '/home/sergio/Escritorio/prueba.txt')
+    # print(f'Blob ID: {blob_id}')
+    # client.delete_blob(blob_id, 'token_for_admin')
+    #client.get_blob('69093d05cb466d29', 'token_for_admin')
+    #client.post_patch_blob('69093d05cb466d29', 'token_for_admin', '/home/sergio/Escritorio/prueba2.txt', 'POST')
     #client.post_patch_blob('36ef169ddf93b54d', 'token_for_admin', '/home/sergio/Escritorio/prueba.txt', 'PATCH')
-    #client.get_roles_blob('36ef169ddf93b54d', 'token_for_user')
-    #client.post_patch_roles_blob('36ef169ddf93b54d', 'token_for_admin' ,['jesus', 'fran', 'jaime'], 'POST')
+    #client.get_roles_blob('69093d05cb466d29', 'token_for_admin')
+    #client.post_patch_roles_blob('69093d05cb466d29', 'token_for_admin' ,['jesus', 'fran', 'jaime'], 'POST')
     #client.post_patch_roles_blob('06db2be4c3c10c78', ['paco', 'admin', 'antonio'], 'PATCH')
-    #client.get_name_blob('36ef169ddf93b54d', 'token_for_user')
-    #client.post_patch_names_blob('36ef169ddf93b54', 'token_for_user', 'blob', 'POST')
+    #client.get_name_blob('69093d05cb466d29', 'token_for_admin')
+    #client.post_patch_names_blob('69093d05cb466d29', 'token_for_admin', 'blob_3', 'POST')

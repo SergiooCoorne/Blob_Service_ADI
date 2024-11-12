@@ -1,31 +1,6 @@
 import pytest
-import json
-from unittest.mock import patch, MagicMock
-from io import BytesIO
-from flask import Flask
-from src.Presentation.presentation_blob import app
 from requests_toolbelt import MultipartEncoder
 import os
-
-@pytest.fixture
-def client(request):
-     # Obtener valores desde las opciones de pytest
-    port = request.config.getoption("--port")
-    listening = request.config.getoption("--listening")
-    storage = request.config.getoption("--storage")
-    
-    # Configura las variables de entorno para los parámetros
-    if port:
-        os.environ["APP_PORT"] = port
-    if listening:
-        os.environ["APP_LISTENING"] = listening
-    if storage:
-        os.environ["APP_STORAGE"] = storage
-
-
-    # Crea un cliente de prueba para hacer peticiones a la API
-    with app.test_client() as client:
-        yield client
 
 @pytest.fixture
 def blob_for_test(client):

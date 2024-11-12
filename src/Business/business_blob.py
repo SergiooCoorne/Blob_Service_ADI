@@ -1,8 +1,10 @@
 import sys
-sys.path.append("/home/sergio/Escritorio/Uni/Primer_Cutri/ADI/Trabajo_1_ADI")
-
-from src.Persistence.persistence_blob import Persistence, BlobNotFound 
+import os
 from typing import List, Union
+
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
+sys.path.append(project_root)
+from src.Persistence.persistence_blob import Persistence, BlobNotFound 
 
 class Forbidden(Exception):
     """Excepción para cuando un no se tengan permisos de modificacion."""

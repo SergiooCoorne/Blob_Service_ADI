@@ -1,29 +1,52 @@
 import sys
 import os
-sys.path.append("/home/sergio/Escritorio/Uni/Primer_Cutri/ADI/Trabajo_1_ADI") #Linea necesario para que el interprete de python coja bien las rutas a la hora de lanzar la aplicacion
 import argparse
 from flask import Flask, Response, request
 from typing import List, Union
-from src.Business.business_blob import Business
 import getpass
 import requests
 import json
+
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
+sys.path.append(project_root)
+from src.Business.business_blob import Business
 
 name_system = getpass.getuser()
 URL_TOKEN_SERVICE = 'http://127.0.0.1:3002'
 
 app = Flask(__name__)
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-p', '--port', type=int, default=3003, help="Número de puerto (por defecto 3003)")
-parser.add_argument('-l', '--listening', type=str, default='0.0.0.0', help="Dirección donde se producirá la escucha (por defecto '0.0.0.0')")
-parser.add_argument('-s', '--storage', type=str, default=f'/home/{name_system}', help=f'Ruta donde se almacenará la persistencia (por defecto /home/{name_system})')
-
-args = parser.parse_args()
-
+global UPLOAD_DIRECTORY
+global business
 ROOT_API = '/api/v1'
-UPLOAD_DIRECTORY = f'{args.storage}/persistence_dir'
-business = Business(UPLOAD_DIRECTORY)
+
+def create_app():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-p', '--port', type=int, default=3003, help="Número de puerto (por defecto 3003)")
+    parser.add_argument('-l', '--listening', type=str, default='0.0.0.0', help="Dirección donde se producirá la escucha (por defecto '0.0.0.0')")
+    parser.add_argument('-s', '--storage', type=str, default=f'/home/{name_system}/persistence_dir', help=f'Ruta donde se almacenará la persistencia (por defecto "/home/{name_system}/persistence_dir")')
+
+    #Si no estamos pasando los test, le pasamos argumentos por defecto
+    if os.getenv("PYTEST_CURRENT_TEST") is None:
+        args = parser.parse_args()
+        app.config["PORT"] = args.port
+        app.config["LISTENING"] = args.listening
+        app.config["STORAGE"] = args.storage
+    else:
+        # Valores predeterminados para pruebas
+        app.config["PORT"] = 3003
+        app.config["LISTENING"] = "0.0.0.0"
+        app.config["STORAGE"] = f'/home/{name_system}/persistence_dir'
+    
+    # Almacenamos la ruta de persistencia en la variable global
+    global UPLOAD_DIRECTORY
+    UPLOAD_DIRECTORY = app.config["STORAGE"]
+
+    # Creamos nuestra instancia de la capa de negocio
+    global business
+    business = Business(UPLOAD_DIRECTORY)
+
+    return app
 
 @app.route(f'{ROOT_API}/blob', methods=('PUT',))
 def put_blob():
@@ -225,8 +248,9 @@ def get_data_token(authToken) -> Union[List[str], str]:
         
     return roles, owner
 
-def main():
-    app.run(host=f'{args.listening}', port=args.port, debug=True)
+def main(app):
+    app.run(host=app.config["LISTENING"], port=app.config["PORT"], debug=True)
 
 if __name__ == '__main__':
-    main()
+    app = create_app()
+    main(app)
