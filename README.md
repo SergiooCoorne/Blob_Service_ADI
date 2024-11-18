@@ -47,3 +47,6 @@ Para ejecutarlos, desde el direcotrio raiz del proyecto solo hay que ejecutar `p
 
 Si queremos ver la cobertura del proyecto ejecutamos `pytest --cov=blobservice --cov-report=html`. Esto nos creará una carpeta donde tendremos un __index.html__ en el cual se podrá ver
 la cobertura del código
+
+## Aclaración importante
+Para que el servicio funcione de forma correcta, es necesario que esté activo el servicio de tokens, ya sea bien por el mock proporcionado para la practica, o por un servicio de tokens desarollado al completo
