@@ -162,13 +162,13 @@ class Client:
             _assert_status_ok_(response.status_code)
             print(f'{response.status_code}, {response.text}')
     
-# if __name__ == '__main__':
-#     client = Client('http://localhost:3003/api/v1')
+#if __name__ == '__main__':
+    #client = Client('http://172.17.0.2:3003/api/v1')
     #writted_by = ['admin', 'Paco', 'Antonio']
-    # blob_id = client.put_blob('token_for_admin', 'blob_2', writted_by, '/home/sergio/Escritorio/prueba.txt')
+    #blob_id = client.put_blob('token_for_admin', 'blob_2', writted_by, '/home/sergio/Escritorio/prueba.txt')
     # print(f'Blob ID: {blob_id}')
     # client.delete_blob(blob_id, 'token_for_admin')
-    #client.get_blob('69093d05cb466d29', 'token_for_admin')
+    #client.get_blob('b9a747ffe514678c', 'token_for_admin')
     #client.post_patch_blob('69093d05cb466d29', 'token_for_admin', '/home/sergio/Escritorio/prueba2.txt', 'POST')
     #client.post_patch_blob('36ef169ddf93b54d', 'token_for_admin', '/home/sergio/Escritorio/prueba.txt', 'PATCH')
     #client.get_roles_blob('69093d05cb466d29', 'token_for_admin')

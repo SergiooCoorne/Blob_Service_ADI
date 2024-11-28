@@ -12,7 +12,7 @@ sys.path.append(project_root)
 from blobservice.Business.business_blob import Business
 
 name_system = getpass.getuser()
-URL_TOKEN_SERVICE = 'http://127.0.0.1:3002'
+URL_TOKEN_SERVICE = 'http://192.168.18.114:3002'
 
 app = Flask(__name__)
 
@@ -24,7 +24,7 @@ def create_app():
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', '--port', type=int, default=3003, help="Número de puerto (por defecto 3003)")
     parser.add_argument('-l', '--listening', type=str, default='0.0.0.0', help="Dirección donde se producirá la escucha (por defecto '0.0.0.0')")
-    parser.add_argument('-s', '--storage', type=str, default=f'/home/{name_system}/persistence_dir', help=f'Ruta donde se almacenará la persistencia (por defecto "/home/{name_system}/persistence_dir")')
+    parser.add_argument('-s', '--storage', type=str, default=f'./storage/', help=f'Ruta donde se almacenará la persistencia (por defecto "./storage/")')
 
     #Si no estamos pasando los test, le pasamos argumentos por defecto
     if os.getenv("PYTEST_CURRENT_TEST") is None:
@@ -36,7 +36,7 @@ def create_app():
         # Valores predeterminados para pruebas
         app.config["PORT"] = 3003
         app.config["LISTENING"] = "0.0.0.0"
-        app.config["STORAGE"] = f'/home/{name_system}/persistence_dir'
+        app.config["STORAGE"] = f'./storage/'
     
     # Almacenamos la ruta de persistencia en la variable global
     global UPLOAD_DIRECTORY
@@ -72,8 +72,6 @@ def put_blob():
     name = request.form.get('name')
     roles = request.form.get('writable_by')
     owner = request.form.get('owner')
-    
-    print(f'File: {file}')
 
     blob_id = business.put_blob(name, owner, roles, file_path, file)
 
