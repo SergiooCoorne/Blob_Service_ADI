@@ -35,18 +35,26 @@ O si por le contrario queremos especificar el puerto de escucha, dirección y ru
 blob_service -p <puerto> -l <direccion> -s <ruta>
 ```
 
-## Instalacion de los test
+## Instalación de los test
 
 Si se van a correr test de forma manual, hay que instalar la siguiente dependencia:
 
 - Para ello: `pip install .[tests]`
 
-# Ejecucion de los test
+## Ejecución de los test
 
 Para ejecutarlos, desde el direcotrio raiz del proyecto solo hay que ejecutar `pytest` 
 
 Si queremos ver la cobertura del proyecto ejecutamos `pytest --cov=blobservice --cov-report=html`. Esto nos creará una carpeta donde tendremos un __index.html__ en el cual se podrá ver
 la cobertura del código
+
+## Virtualización
+En esta sección se va a explicar como virtualizar el servicio mediante la herramienta __Docker__
+
+### Instalación
+Para virtualizarlo lo unico que tenemos que hacer es ejecutar el script que hay en la carpeta `/scripts` llamado `build.sh`. Posteriormente, ejecutamos `run.sh` para que el servicio se ponga en funcionamiento. 
+
+Para detenerlo, lo único que tenemos que hacer es ejecutar `stop.sh`
 
 ## Aclaración importante
 Para que el servicio funcione de forma correcta, es necesario que esté activo el servicio de tokens, ya sea bien por el mock proporcionado para la practica, o por un servicio de tokens desarollado al completo
