@@ -12,7 +12,8 @@ sys.path.append(project_root)
 from blobservice.Business.business_blob import Business
 
 name_system = getpass.getuser()
-URL_TOKEN_SERVICE = 'http://192.168.18.114:3002'
+# URL_TOKEN_SERVICE = 'http://192.168.18.114:3002'
+URL_TOKEN_SERVICE = os.getenv("TOKEN_SERVICE", "http://192.168.18.114:3002") 
 
 app = Flask(__name__)
 
@@ -86,8 +87,12 @@ def delete_blob(blob_id):
         return Response('Unauthorized', status = 401)
 
     #Obtenemos los roles del usuario
-    roles_user, name_user = get_data_token(auth_token)
-    
+    try:
+        roles_user, name_user = get_data_token(auth_token)
+    except Exception as e:
+        print(f'Exception: {str(e)}')
+        return Response('Unauthorized', status=401)
+
     #Llamamos a la capa de negocio para que intente hacer la operacion de borrado
     try:
         rtr_code = business.delete_blob(blob_id, auth_token, roles_user)
@@ -108,7 +113,11 @@ def data_blob(blob_id):
     if not auth_token:
         return Response('Unauthorized', status = 401)
     
-    roles_user, name_user = get_data_token(auth_token)
+    try:
+        roles_user, name_user = get_data_token(auth_token)
+    except Exception as e:
+        print(f'Exception: {str(e)}')
+        return Response('Unauthorized', status=401)
     
     if request.method == 'GET':
         try:
@@ -129,7 +138,11 @@ def data_blob(blob_id):
         
     if request.method == 'POST' or request.method == 'PATCH':
         #Sacamos los roles del user que quiere modificar el Blob
-        roles_user, name_user = get_data_token(auth_token)
+        try:
+            roles_user, name_user = get_data_token(auth_token)
+        except Exception as e:
+            print(f'Exception: {str(e)}')
+            return Response('Unauthorized', status=401)
                 
         # Comprobación del archivo en la petición
         if 'file' not in request.files:
@@ -158,7 +171,11 @@ def roles_blob(blob_id):
     if not auth_token:
         return Response('', status = 401)
     
-    roles_user, name_user = get_data_token(auth_token)
+    try:
+        roles_user, name_user = get_data_token(auth_token)
+    except Exception as e:
+        print(f'Exception: {str(e)}')
+        return Response('Unauthorized', status=401)
     
     if request.method == 'GET':
         try:
@@ -175,7 +192,12 @@ def roles_blob(blob_id):
 
     if request.method == 'PATCH' or request.method == 'POST':
         #Sacamos los roles del user que quiere modificar el Blob
-        roles_user, name_user = get_data_token(auth_token)
+        try:
+            roles_user, name_user = get_data_token(auth_token)
+        except Exception as e:
+            print(f'Exception: {str(e)}')
+            return Response('Unauthorized', status=401)
+        
         new_roles = request.json.get('writable_by')
         
         try:
@@ -199,7 +221,11 @@ def name_blob(blob_id):
         return Response('Bad Request', status = 401)
     
     if request.method == 'GET':
-        roles_user, name_user = get_data_token(auth_token)
+        try:
+            roles_user, name_user = get_data_token(auth_token)
+        except Exception as e:
+            print(f'Exception: {str(e)}')
+            return Response('Unauthorized', status=401)
         
         try:
             name_blob, rtr_code = business.get_name_blob(blob_id, auth_token, roles_user)
@@ -216,7 +242,12 @@ def name_blob(blob_id):
 
     if request.method == 'PATCH' or request.method == 'POST':
         #Sacamos los roles del user que quiere modificar el Blob
-        roles_user, name_user = get_data_token(auth_token)
+        try:
+            roles_user, name_user = get_data_token(auth_token)
+        except Exception as e:
+            print(f'Exception: {str(e)}')
+            return Response('Unauthorized', status=401)
+        
         new_name = request.json.get('name')
         
         try:

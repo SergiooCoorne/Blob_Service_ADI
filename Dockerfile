@@ -7,6 +7,9 @@ RUN groupadd -r blobUser && useradd -r -g blobUser blobUser
 #Definimos la variable donde se va a guardar la persistencia
 ENV BLOB_SERVICE_STORAGE=/service/storage
 
+#Variable de entorno para acceder al servicio de tokens
+ENV TOKEN_SERVICE=http://192.168.18.114:3002
+
 #Creamos la carpeta storage
 RUN mkdir -p $BLOB_SERVICE_STORAGE
 
