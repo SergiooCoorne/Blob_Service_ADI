@@ -12,3 +12,6 @@ sudo docker stop service
 # Eliminamos nuestro volumen montado para la persistencia
 STORAGE="$(pwd)/storage"
 sudo rm -rf "$STORAGE"
+
+#Parar el servicio que esta corriendo en local del token_service
+sudo pkill token_service

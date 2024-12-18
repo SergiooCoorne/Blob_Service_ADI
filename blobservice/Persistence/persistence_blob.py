@@ -43,6 +43,7 @@ class Persistence:
         if not os.path.exists(self.json_path):
             with open(self.json_path, 'w') as f:
                 json.dump({}, f)  # Escribimos un objeto JSON vacío
+            os.chmod(self.json_path, 0o777)
 
     def create_blob(self, name: str, owner: str, roles: list[str], file_path: str, file) -> Union[str, bool]:
         rtn = False #Valor que se va a devolver para verificar si se ha hecho de forma correcta la operacion o no
